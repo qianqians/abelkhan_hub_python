@@ -1,4 +1,4 @@
-function channel(_ws){
+function channel(_sock){
     eventobj.call(this);
 
     this.events = [];
@@ -6,11 +6,10 @@ function channel(_ws){
     this.offset = 0;
     this.data = null;
 
-    this.ws = _ws;
-    this.ws.ch = this;
-    this.ws.binaryType = "arraybuffer";
-    this.ws.onmessage = function(evt){
-        var u8data = new Uint8Array(evt.data);
+    this.sock = _sock;
+    this.sock.ch = this;
+    this.sock.on('data', function(data){
+        var u8data = new Uint8Array(data);
         
         var new_data = new Uint8Array(this.ch.offset + u8data.byteLength);
         if (this.ch.data !== null){
@@ -43,13 +42,13 @@ function channel(_ws){
         }else{
             this.ch.offset = 0;
         }
-    }
-    this.ws.onclose = function(){
+    });
+    this.sock.on('close', function(){
         this.ch.call_event("ondisconnect", [this.ch]);
-    }
-    this.ws.onerror = function(){
+    });
+    this.ws.on('error', function(error){
         this.ch.call_event("ondisconnect", [this.ch]);
-    }
+    });
     
     this.push = function(event){
         var json_str = Json.stringify(event);
@@ -62,6 +61,6 @@ function channel(_ws){
         send_data[3] = (u8data.length >> 24) & 0xff;
         send_data.set(u8data, 4);
 
-        this.ws.send(send_data.buffer);
+        this.sock.write(send_data.buffer);
     }
 }

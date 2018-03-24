@@ -11,6 +11,10 @@ function gm_center_module(){
         this.call_event("close_clutter", [argv0]);
     }
 
+    this.reload = function(argv0, argv1){
+        this.call_event("reload", [argv0, argv1]);
+    }
+
 }
 (function(){
     var Super = function(){};

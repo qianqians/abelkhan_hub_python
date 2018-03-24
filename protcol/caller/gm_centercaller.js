@@ -12,6 +12,11 @@ function gm_center_caller(ch){
         this.call_module_method.call(this, "close_clutter", _argv);
     }
 
+    this.reload = function( argv0, argv1){
+        var _argv = [argv0,argv1];
+        this.call_module_method.call(this, "reload", _argv);
+    }
+
 }
 (function(){
     var Super = function(){};

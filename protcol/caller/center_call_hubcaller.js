@@ -7,6 +7,11 @@ function center_call_hub_caller(ch){
         this.call_module_method.call(this, "distribute_server_address", _argv);
     }
 
+    this.reload = function( argv0){
+        var _argv = [argv0];
+        this.call_module_method.call(this, "reload", _argv);
+    }
+
 }
 (function(){
     var Super = function(){};

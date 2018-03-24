@@ -10,6 +10,8 @@ function connectservice(_process){
         ch.add_event_listen("ondisconnect", this, this.on_channel_disconn);
 
         this.process.reg_channel(ch);
+
+        return ch;
     }
 
     this.on_channel_disconn = function(ch){

@@ -7,6 +7,10 @@ function center_call_hub_module(){
         this.call_event("distribute_server_address", [argv0, argv1, argv2, argv3]);
     }
 
+    this.reload = function(argv0){
+        this.call_event("reload", [argv0]);
+    }
+
 }
 (function(){
     var Super = function(){};
