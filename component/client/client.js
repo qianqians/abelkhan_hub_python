@@ -76,4 +76,3 @@ function client(_uuid){
         this.juggle_service.poll();
     }
 }
-module.exports.client = client;
