@@ -1,5 +1,5 @@
 function client(_uuid){
-    eventobj.call(this);
+    event_closure.call(this);
 
     this.uuid = _uuid;
     this.modules = new modulemng();
