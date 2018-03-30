@@ -1,5 +1,5 @@
 function hub(argvs){
-    eventobj.call(this);
+    event_closure.call(this);
 
     var UUID = require('uuid');
     this.uuid = UUID.v1();

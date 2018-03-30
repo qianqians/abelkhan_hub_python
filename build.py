@@ -17,6 +17,7 @@ client_js = ['./component/client/client.js']
 hub_js = ['./component/hub/center_msg_handle.js', './component/hub/centerproxy.js', './component/hub/closehandle.js', './component/hub/dbproxy_msg_handle.js',
           './component/hub/dbproxyproxy.js', './component/hub/gate_msg_handle.js', './component/hub/gateproxys.js', './component/hub/hub_msg_handle.js',
           './component/hub/hubproxys.js', './component/hub/hub.js']
+event_closure_js = ['./event_closure/event_closure.js']
 
 def read_file(file_list, codes):
         for f_name in file_list:
@@ -28,6 +29,7 @@ def build_web_client():
         codes = []
         
         read_file(juggle_js, codes)
+        read_file(event_closure_js, codes)
         read_file(service_web_js, codes)
         read_file(protcol_js, codes)
         read_file(module_js, codes)
@@ -39,6 +41,7 @@ def build_node_js_hub():
         codes = []
         
         read_file(juggle_js, codes)
+        read_file(event_closure_js, codes)
         read_file(service_node_js, codes)
         read_file(protcol_js, codes)
         read_file(module_js, codes)
