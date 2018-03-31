@@ -27,9 +27,10 @@ function gateproxy(ch, hub){
 	}
 }
 
-function gatemng(conn){
+function gatemng(conn, hub){
     eventobj.call(this);
     this.conn = conn;
+    this.hub = hub;
 
     this.current_client_uuid = ""
     this.clients = {};
@@ -38,7 +39,7 @@ function gatemng(conn){
 
     this.connect_gate = function(uuid, ip, port){
 		this.conn.connect(ip, port, this, function(ch){
-            this.gates[uuid] = new gateproxy(ch);
+            this.gates[uuid] = new gateproxy(ch, hub);
             ch.gateproxy = this.gates[uuid];
             this.gates[uuid].reg_hub();
         });
@@ -52,6 +53,8 @@ function gatemng(conn){
         if (this.clients[client_uuid]){
             return;
         }
+
+        getLogger().trace("reg client:%s", client_uuid);
 
         this.clients[client_uuid] = gate_ch.gateproxy;
         gate_ch.gateproxy.connect_sucess(client_uuid);
@@ -78,21 +81,23 @@ function gatemng(conn){
         }
     }
 
-    this.call_client = function(uuid, _module, func, argvs){
+    this.call_client = function(uuid, _module, func){
 		if (this.clients[uuid]){
-            this.clients[uuid].forward_hub_call_client(uuid, _module, func, argvs);
+            this.clients[uuid].forward_hub_call_client(uuid, _module, func, [].slice.call(arguments, 3));
         }  
     }
 
-    this.call_group_client = function(uuids, _module, func, argvs){
+    this.call_group_client = function(uuids, _module, func){
+        var argvs = [].slice.call(arguments, 3)
 		for(let uuid in this.gates){
 			this.gates[uuid].forward_hub_call_group_client(uuids, _module, func, argvs);
 		}
 	}
 
-	this.call_global_client = function(_module, func, argvs){
+	this.call_global_client = function(_module, func){
+        var argvs = [].slice.call(arguments, 2)
 		for(let uuid in this.gates){
-			this.gates[uuid].forward_hub_call_global_client(_module, func, _argvs_list);
+			this.gates[uuid].forward_hub_call_global_client(_module, func, argvs);
 		}
 	}
 

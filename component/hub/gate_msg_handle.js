@@ -2,9 +2,12 @@ function gate_msg_handle(_hub, _modulemng){
     this.hub = _hub;
     this.modulemng = _modulemng;
 
-    this.reg_hub_sucess = function(){}
+    this.reg_hub_sucess = function(){
+        getLogger().trace("connect gate sucess");
+    }
 
     this.client_connect = function(client_uuid){
+        getLogger().trace("client connect:%s", client_uuid);
         this.hub.gates.client_connect(client_uuid, current_ch);
     }
 

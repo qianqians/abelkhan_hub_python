@@ -1,5 +1,5 @@
 function juggleservice(){
-    this.process_set = [];
+    this.process_set = new Array();
     
     this.add_process = function(_process){
 		this.process_set.push(_process);
@@ -7,7 +7,7 @@ function juggleservice(){
     
     this.poll = function(){
         for(var p in this.process_set){
-            p.poll();
+            this.process_set[p].poll();
         }
     }
 }

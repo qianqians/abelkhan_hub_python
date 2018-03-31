@@ -1,5 +1,5 @@
 function dbproxyproxy(ch){
-    this.hub_call_dbproxy = new dbproxy_call_hub_caller(ch);
+    this.hub_call_dbproxy = new hub_call_dbproxy_caller(ch);
     this.callback_set = {};
     this.end_cb_set = {};
 

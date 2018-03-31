@@ -1,0 +1,54 @@
+[2018-03-31T20:10:48.629] [TRACE] normal - config logger!
+[2018-03-31T20:10:48.639] [TRACE] normal - begin connect host:127.0.0.1, port:1234
+[2018-03-31T20:10:48.639] [TRACE] normal - connectting host:127.0.0.1, port:1234
+[2018-03-31T20:10:48.639] [TRACE] normal - begin on connect center
+[2018-03-31T20:10:48.639] [TRACE] normal - ["center","reg_server",["hub","127.0.0.1",4235,"8c49b3d0-34dc-11e8-b9ac-f740478c4003"]]
+[2018-03-31T20:10:48.639] [TRACE] normal - end on connect center
+[2018-03-31T20:10:48.639] [TRACE] normal - end connect host:127.0.0.1, port:1234
+[2018-03-31T20:10:48.669] [TRACE] normal - begin on data
+[2018-03-31T20:10:48.669] [TRACE] normal - ["hub_call_hub","reg_hub",["hub_server"]]
+[2018-03-31T20:10:48.669] [TRACE] normal - end on data
+[2018-03-31T20:10:48.669] [TRACE] normal - begin on data
+[2018-03-31T20:10:48.669] [TRACE] normal - ["center_call_hub","distribute_server_address",["gate","127.0.0.1",1236,"6cb8b4d0-98d9-4a27-831b-f2115b9ac7be"]]
+[2018-03-31T20:10:48.669] [TRACE] normal - ["center_call_hub","distribute_server_address",["dbproxy","127.0.0.1",1235,"21403e22-6056-4a73-96ee-baff1abadf35"]]
+[2018-03-31T20:10:48.669] [TRACE] normal - end on data
+[2018-03-31T20:10:48.669] [TRACE] normal - ["hub_call_hub","reg_hub_sucess",[]]
+[2018-03-31T20:10:48.669] [TRACE] normal - begin connect host:127.0.0.1, port:1236
+[2018-03-31T20:10:48.669] [TRACE] normal - begin connect host:127.0.0.1, port:1235
+[2018-03-31T20:10:48.669] [TRACE] normal - begin on data
+[2018-03-31T20:10:48.669] [TRACE] normal - ["center_call_hub","distribute_server_address",["hub","127.0.0.1",4234,"8c46a690-34dc-11e8-b3da-1f8228141c61"]]
+[2018-03-31T20:10:48.669] [TRACE] normal - ["center_call_server","reg_server_sucess",[]]
+[2018-03-31T20:10:48.669] [TRACE] normal - end on data
+[2018-03-31T20:10:48.669] [TRACE] normal - begin connect host:127.0.0.1, port:4234
+[2018-03-31T20:10:48.669] [TRACE] normal - connect center sucess
+[2018-03-31T20:10:48.679] [TRACE] normal - connectting host:127.0.0.1, port:1236
+[2018-03-31T20:10:48.679] [TRACE] normal - ["hub_call_gate","reg_hub",["8c49b3d0-34dc-11e8-b9ac-f740478c4003","hub_server1"]]
+[2018-03-31T20:10:48.679] [TRACE] normal - end connect host:127.0.0.1, port:1236
+[2018-03-31T20:10:48.679] [TRACE] normal - connectting host:127.0.0.1, port:1235
+[2018-03-31T20:10:48.679] [TRACE] normal - ["hub_call_dbproxy","reg_hub",["8c49b3d0-34dc-11e8-b9ac-f740478c4003"]]
+[2018-03-31T20:10:48.679] [TRACE] normal - end connect host:127.0.0.1, port:1235
+[2018-03-31T20:10:48.679] [TRACE] normal - connectting host:127.0.0.1, port:4234
+[2018-03-31T20:10:48.679] [TRACE] normal - ["hub_call_hub","reg_hub",["hub_server1"]]
+[2018-03-31T20:10:48.679] [TRACE] normal - end connect host:127.0.0.1, port:4234
+[2018-03-31T20:10:48.679] [TRACE] normal - begin on data
+[2018-03-31T20:10:48.679] [TRACE] normal - ["hub_call_hub","reg_hub_sucess",[]]
+[2018-03-31T20:10:48.679] [TRACE] normal - end on data
+[2018-03-31T20:10:48.679] [TRACE] normal - connect hub sucess
+[2018-03-31T20:10:48.689] [TRACE] normal - begin on data
+[2018-03-31T20:10:48.689] [TRACE] normal - ["gate_call_hub","reg_hub_sucess",[]]
+[2018-03-31T20:10:48.689] [TRACE] normal - end on data
+[2018-03-31T20:10:48.689] [TRACE] normal - connect gate sucess
+[2018-03-31T20:10:48.689] [TRACE] normal - begin on data
+[2018-03-31T20:10:48.689] [TRACE] normal - ["dbproxy_call_hub","reg_hub_sucess",[]]
+[2018-03-31T20:10:48.689] [TRACE] normal - end on data
+[2018-03-31T20:10:48.689] [TRACE] normal - connect db sucess
+[2018-03-31T20:10:57.738] [TRACE] normal - begin on data
+[2018-03-31T20:10:57.738] [TRACE] normal - ["gate_call_hub","client_connect",["91aaa7cf-34dc-11e8-bddc-f832e4742ca8"]]
+[2018-03-31T20:10:57.738] [TRACE] normal - end on data
+[2018-03-31T20:10:57.739] [TRACE] normal - client connect:91aaa7cf-34dc-11e8-bddc-f832e4742ca8
+[2018-03-31T20:10:57.739] [TRACE] normal - reg client:91aaa7cf-34dc-11e8-bddc-f832e4742ca8
+[2018-03-31T20:10:57.739] [TRACE] normal - ["hub_call_gate","connect_sucess",["91aaa7cf-34dc-11e8-bddc-f832e4742ca8"]]
+[2018-03-31T20:11:04.839] [TRACE] normal - begin on data
+[2018-03-31T20:11:04.839] [TRACE] normal - ["hub_call_hub","hub_call_hub_mothed",["ack_conn_module","client_connect_hub",["91aaa7cf-34dc-11e8-bddc-f832e4742ca8"]]]
+[2018-03-31T20:11:04.839] [TRACE] normal - end on data
+[2018-03-31T20:11:04.840] [TRACE] normal - ["hub_call_gate","forward_hub_call_client",["91aaa7cf-34dc-11e8-bddc-f832e4742ca8","conn_module","connect_hub_server_fucess",[]]]

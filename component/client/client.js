@@ -7,9 +7,9 @@ function client(_uuid){
     this.is_enable_heartbeats = false;
     this.tick = new Date().getTime();
 
-    var _process = new process();
-    var _module = new gate_call_clientmodule();
-    _process.reg_module(_module);
+    this._process = new process();
+    var _module = new gate_call_client_module();
+    this._process.reg_module(_module);
     _module.add_event_listen("connect_gate_sucess", this, function(){
         this.is_conn_gate = true;
         this.heartbeats_time = new Date().getTime();
@@ -27,16 +27,18 @@ function client(_uuid){
         this.modules.process_module_mothed(module_name, func_name, argvs);
     });
 
-    this.conn = new connectservice(_process);
+    this.conn = new connectservice(this._process);
 
     this.juggle_service = new juggleservice();
-    this.juggle_service.add_process(_process);
+    this.juggle_service.add_process(this._process);
+    var juggle_service = this.juggle_service;
 
     this.connect_server = function(url){
         this.ch = this.conn.connect(url);
-
-        this.client_call_gate = new client_call_gatecaller(this.ch);
-		this.client_call_gate.connect_server(this.uuid, new Date().getTime());
+        this.ch.add_event_listen("onopen", this, function(){
+            this.client_call_gate = new client_call_gate_caller(this.ch);
+            this.client_call_gate.connect_server(this.uuid, new Date().getTime());
+        });
     }
 
     this.enable_heartbeats = function(){
@@ -47,15 +49,15 @@ function client(_uuid){
     }
 
     this.connect_hub = function(hub_name){
-        this.client_call_gate.connect_hub(uuid, hub_name);
+        this.client_call_gate.connect_hub(this.uuid, hub_name);
     }
 
-    this.call_hub = function(hub_name, module_name, func_name, _argvs){
-        this.client_call_gate.forward_client_call_hub(hub_name, module_name, func_name, _argvs);
+    this.call_hub = function(hub_name, module_name, func_name){
+        this.client_call_gate.forward_client_call_hub(hub_name, module_name, func_name, [].slice.call(arguments, 3));
     }
 
     this.heartbeats = function(){
-        if (!is_conn_gate){
+        if (!this.is_conn_gate){
             return;
         }
 
@@ -71,8 +73,9 @@ function client(_uuid){
         this.tick = now;
     }
 
+    var that = this;
     this.poll = function(){
-        this.heartbeats();
-        this.juggle_service.poll();
+        that.heartbeats();
+        juggle_service.poll();
     }
 }

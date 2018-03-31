@@ -3,6 +3,7 @@ function center_msg_handle(_hub_, _centerproxy_){
     this._centerproxy = _centerproxy_;
 
     this.reg_server_sucess = function(){
+        getLogger().trace("connect center sucess");
         this._centerproxy.is_reg_center_sucess = true;
     }
 

@@ -7,7 +7,9 @@ function hub_msg_handle(modules, hubs){
         _proxy.reg_hub_sucess();
     }
 
-    this.reg_hub_sucess = function(){}
+    this.reg_hub_sucess = function(){
+        getLogger().trace("connect hub sucess");
+    }
 
     this.hub_call_hub_mothed = function(module_name, func_name, argvs){
         this.modules.process_module_mothed(module_name, func_name, argvs);

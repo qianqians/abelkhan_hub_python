@@ -26,7 +26,12 @@ function channel(_ws){
             }
 
             var json_str = new TextDecoder('utf-8').decode( new_data.subarray( 4, (len + 4) ) );
-            this.ch.events.push(Json.parse(json_str));
+            var end = 0;
+            for(var i = 0; json_str[i] != '\0' & i < json_str.length; i++){
+                end++;
+            }
+            json_str = json_str.substring(0, end);
+            this.ch.events.push(JSON.parse(json_str));
             
             if ( new_data.length > (len + 4) ){
                 new_data = new_data.subarray(len + 4);
@@ -44,6 +49,9 @@ function channel(_ws){
             this.ch.offset = 0;
         }
     }
+    this.ws.onopen = function(){
+        this.ch.call_event("onopen", [this.ch]);
+    }
     this.ws.onclose = function(){
         this.ch.call_event("ondisconnect", [this.ch]);
     }
@@ -52,7 +60,7 @@ function channel(_ws){
     }
     
     this.push = function(event){
-        var json_str = Json.stringify(event);
+        var json_str = JSON.stringify(event);
         var u8data = new TextEncoder('utf-8').encode(json_str);
 
         var send_data = new Uint8Array(4 + u8data.length);
@@ -63,5 +71,13 @@ function channel(_ws){
         send_data.set(u8data, 4);
 
         this.ws.send(send_data.buffer);
+    }
+
+    this.pop = function(){
+        if (this.events.length === 0){
+            return null;
+        }
+
+        return this.events.shift();
     }
 }

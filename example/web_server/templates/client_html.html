@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+</head>
+
+<body>
+</body>
+
+<script language="javascript" src="/client.js"></script>
+<script type="text/javascript">
+    var conn_module = {
+        connect_hub_server_fucess : function(){ alert("connect_hub_server_fucess") }
+    };
+
+    var _client = new client("{{uuid}}");
+    _client.modules.add_module("conn_module", conn_module);
+    _client.add_event_listen("on_connect_gate", function(){
+        _client.connect_hub("hub_server");
+        _client.connect_hub("hub_server1");
+    });
+    var con_hub = [];
+    _client.add_event_listen("on_connect_hub", function(hub_name){
+        con_hub.push(hub_name);
+        if (con_hub.indexOf("hub_server") !== -1 & con_hub.indexOf("hub_server1") !== -1)
+        {
+            _client.call_hub("hub_server", "conn_module", "connect_hub_server");
+        }
+    });
+
+    _client.connect_server("ws://127.0.0.1:3236");
+    
+    window.setInterval(_client.poll, 50);
+</script>
+
+</html>

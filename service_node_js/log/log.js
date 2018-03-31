@@ -1,19 +1,19 @@
-function logger(logfilepath){
+function configLogger(logfilepath, _level){
     var log4js = require('log4js');
     log4js.configure({
-        appenders: [
-            {   
-                type: 'console' 
-            }, 
-            {
+        appenders: {
+            normal: {
                 type: 'file',
                 filename: logfilepath, 
                 maxLogSize: 1024*32,
                 backups: 3,
-                category: 'normal' 
             }
-        ]
+        },
+        categories: {default: { appenders: ['normal'], level: _level }}
     });
-    
-    return logger = log4js.getLogger('normal');
+}
+
+function getLogger(){
+    var log4js = require('log4js');
+    return log4js.getLogger('normal');
 }

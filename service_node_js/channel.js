@@ -3,64 +3,81 @@ function channel(_sock){
 
     this.events = [];
     
-    this.offset = 0;
     this.data = null;
 
     this.sock = _sock;
-    this.sock.ch = this;
-    this.sock.on('data', function(data){
-        var u8data = new Uint8Array(data);
-        
-        var new_data = new Uint8Array(this.ch.offset + u8data.byteLength);
-        if (this.ch.data !== null){
-            new_data.set(this.ch.data);
-        }
-        new_data.set(u8data, this.ch.offset);
-
-        while(new_data.length > 4){
-            var len = new_data[0] | new_data[1] << 8 | new_data[2] << 16 | new_data[3] << 24;
-
-            if ( (len + 4) > new_data.length ){
-                break;
-            }
-
-            var json_str = new TextDecoder('utf-8').decode( new_data.subarray( 4, (len + 4) ) );
-            this.ch.events.push(Json.parse(json_str));
+    var ch = this;
+    _sock.on('data', function(data){
+        try
+        {
+            getLogger().trace("begin on data");
             
-            if ( new_data.length > (len + 4) ){
-                new_data = new_data.subarray(len + 4);
+            var new_data = data;
+            if (ch.data !== null){
+                new_data = Buffer.concat([ch.data, new_data]);
             }
-            else{
-                new_data = null;
-                break;
-            }
-        }
 
-        this.ch.data = new_data;
-        if (new_data !== null){
-            this.ch.offset = new_data.length;
-        }else{
-            this.ch.offset = 0;
+            while(new_data.length > 4){
+                var len = new_data[0] | new_data[1] << 8 | new_data[2] << 16 | new_data[3] << 24;
+
+                if ( (len + 4) > new_data.length ){
+                    break;
+                }
+
+                var json_str = new_data.toString('utf-8', 4, (len + 4));
+                var end = 0;
+                for(var i = 0; json_str[i] != '\0' & i < json_str.length; i++){
+                    end++;
+                }
+                json_str = json_str.substring(0, end);
+                getLogger().trace(json_str);
+                ch.events.push(JSON.parse(json_str));
+                
+                if ( new_data.length > (len + 4) ){
+                    new_data = new_data.slice(len + 4);
+                }
+                else{
+                    new_data = null;
+                    break;
+                }
+            }
+
+            ch.data = new_data;
+
+            getLogger().trace("end on data");
+        }
+        catch(err)
+        {
+            getLogger().error(err);
         }
     });
-    this.sock.on('close', function(){
-        this.ch.call_event("ondisconnect", [this.ch]);
+    _sock.on('close', function(){
+        ch.call_event("ondisconnect", [ch]);
     });
-    this.ws.on('error', function(error){
-        this.ch.call_event("ondisconnect", [this.ch]);
+    _sock.on('error', function(error){
+        ch.call_event("ondisconnect", [ch]);
     });
     
     this.push = function(event){
-        var json_str = Json.stringify(event);
-        var u8data = new TextEncoder('utf-8').encode(json_str);
+        var json_str = JSON.stringify(event);
 
-        var send_data = new Uint8Array(4 + u8data.length);
-        send_data[0] = u8data.length & 0xff;
-        send_data[1] = (u8data.length >> 8) & 0xff;
-        send_data[2] = (u8data.length >> 16) & 0xff;
-        send_data[3] = (u8data.length >> 24) & 0xff;
-        send_data.set(u8data, 4);
+        var send_data = new Buffer(4 + json_str.length);
+        send_data.writeUInt8(json_str.length & 0xff, 0);
+        send_data.writeUInt8((json_str.length >> 8) & 0xff, 1);
+        send_data.writeUInt8((json_str.length >> 16) & 0xff, 2);
+        send_data.writeUInt8((json_str.length >> 24) & 0xff, 3);
+        send_data.write(json_str, 4, 4+json_str.length, 'utf-8');
 
-        this.sock.write(send_data.buffer);
+        _sock.write(send_data);
+
+        getLogger().trace(json_str);
+    }    
+    
+    this.pop = function(){
+        if (this.events.length === 0){
+            return null;
+        }
+
+        return this.events.shift();
     }
 }

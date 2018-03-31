@@ -2,6 +2,7 @@ function dbproxy_msg_handle(_hub){
     this.hub = _hub;
 
     this.reg_hub_sucess = function(){
+        getLogger().trace("connect db sucess");
         this.hub.onConnectDB_event();
     }
     
