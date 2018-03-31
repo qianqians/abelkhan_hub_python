@@ -19,11 +19,8 @@ hub_js = ['./component/hub/center_msg_handle.js', './component/hub/centerproxy.j
           './component/hub/dbproxyproxy.js', './component/hub/gate_msg_handle.js', './component/hub/gateproxys.js', './component/hub/hub_msg_handle.js',
           './component/hub/hubproxys.js', './component/hub/hub.js']
 event_closure_js = ['./event_closure/event_closure.js']
-<<<<<<< HEAD
 config_js = ['./service_node_js/config/config.js']
 log_js = ['./service_node_js/log/log.js']
-=======
->>>>>>> c61f5e6c8d2f4103791b6b3b3a4da66904585ddc
 
 def read_file(file_list, codes):
         for f_name in file_list:
