@@ -124,3 +124,4 @@ function hub(argvs){
     }
 }
 module.exports.hub = hub;
+module.exports.event_cb = event_closure;
