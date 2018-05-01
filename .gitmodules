@@ -1,6 +1,1 @@
-[submodule "tools/juggle"]
-	path = tools/juggle
-	url = https://github.com/qianqians/juggle.git
-[submodule "tools/uuid"]
-	path = tools/uuid
-	url = https://github.com/qianqians/uuid_js.git
+
