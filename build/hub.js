@@ -32,9 +32,9 @@ function Imodule(module_name){
         current_ch = null;
     }
 }
-function process(){
+function juggle_process(){
     this.module_set = {};
-    
+
     this.event_set = new Array();
     this.add_event = new Array();
     this.remove_event = new Array();
@@ -50,7 +50,7 @@ function process(){
     this.reg_module = function(_module){
 		this.module_set[_module.module_name] = _module;
     }
-    
+
     this.poll = function(){
         for(ch in this.add_event)
         {
@@ -266,6 +266,23 @@ function center_caller(ch){
     center_caller.prototype = new Super();
 })();
 center_caller.prototype.constructor = center_caller;
+
+/*this caller file is codegen by juggle for js*/
+function hub_call_center_caller(ch){
+    Icaller.call(this, "hub_call_center", ch);
+
+    this.closed = function(){
+        var _argv = [];
+        this.call_module_method.call(this, "closed", _argv);
+    }
+
+}
+(function(){
+    var Super = function(){};
+    Super.prototype = Icaller.prototype;
+    hub_call_center_caller.prototype = new Super();
+})();
+hub_call_center_caller.prototype.constructor = hub_call_center_caller;
 
 /*this caller file is codegen by juggle for js*/
 function hub_call_dbproxy_caller(ch){
@@ -582,11 +599,16 @@ function getLogger(){
 }
 function centerproxy(ch){
     this.is_reg_center_sucess = false;
-    this.hub_call_center = new center_caller(ch);
-    
+    this.center = new center_caller(ch);
+    this.hub_call_center = new hub_call_center_caller(ch);
+
     this.reg_hub = function( ip,  port,  uuid ){
-        this.hub_call_center.reg_server("hub", ip, port, uuid);
+        this.center.reg_server("hub", ip, port, uuid);
 	}
+
+    this.closed = function(){
+        this.hub_call_center.closed();
+    }
 }
 function closehandle(){
     this.is_close = false;
@@ -902,7 +924,7 @@ function hub(argvs){
     if (argvs.length > 1){
         this.cfg = cfg[argvs[1]];
     }
-    
+
     configLogger(this.cfg["log_dir"] + '\\' + this.cfg["log_file"], this.cfg["log_level"]);
     getLogger().trace("config logger!");
 
@@ -917,12 +939,12 @@ function hub(argvs){
     hub_call_hub.add_event_listen("reg_hub", _hub_msg_handle, _hub_msg_handle.reg_hub);
     hub_call_hub.add_event_listen("reg_hub_sucess", _hub_msg_handle, _hub_msg_handle.reg_hub_sucess);
     hub_call_hub.add_event_listen("hub_call_hub_mothed", _hub_msg_handle, _hub_msg_handle.hub_call_hub_mothed);
-    this.hub_process = new process();
+    this.hub_process = new juggle_process();
     this.hub_process.reg_module(hub_call_hub);
     this.accept_hub_service = new acceptservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
     this.connect_hub_service = new connectservice(this.hub_process);
 
-    this.center_process = new process();
+    this.center_process = new juggle_process();
     this.connect_center_service = new connectservice(this.center_process);
     this.connect_center_service.connect(this.center_cfg["ip"], this.center_cfg["port"], this, function(center_ch){
         getLogger().trace("begin on connect center");
@@ -953,7 +975,7 @@ function hub(argvs){
     dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
 	dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
     dbproxy_call_hub.add_event_listen("ack_remove_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_remove_object);
-    this.dbproxy_process = new process();
+    this.dbproxy_process = new juggle_process();
     this.dbproxy_process.reg_module(dbproxy_call_hub);
     this.connect_dbproxy_service = new connectservice(this.dbproxy_process);
 
@@ -964,7 +986,7 @@ function hub(argvs){
     gate_call_hub.add_event_listen("client_disconnect", _gate_msg_handle, _gate_msg_handle.client_disconnect);
     gate_call_hub.add_event_listen("client_exception", _gate_msg_handle, _gate_msg_handle.client_exception);
     gate_call_hub.add_event_listen("client_call_hub", _gate_msg_handle, _gate_msg_handle.client_call_hub);
-    this.gate_process = new process();
+    this.gate_process = new juggle_process();
     this.gate_process.reg_module (gate_call_hub);
     this.connect_gate_servcie = new connectservice(this.gate_process);
     this.gates = new gatemng(this.connect_gate_servcie, this);
@@ -974,18 +996,23 @@ function hub(argvs){
 	this.juggle_service.add_process(this.center_process);
 	this.juggle_service.add_process(this.dbproxy_process);
     this.juggle_service.add_process (this.gate_process);
-    
+
     var juggle_service = this.juggle_service;
     var that = this;
     this.poll = function(){
-        try { 
+        try {
             juggle_service.poll();
         }
         catch(err) {
             getLogger().error(err);
         }
 
-        setImmediate(that.poll);
+        if (!that.close_handle.is_close){
+            setImmediate(that.poll);
+        }else{
+            process.exit();
+        }
+
     }
 
     this.onConnectDB_event = function(){
@@ -994,6 +1021,7 @@ function hub(argvs){
 
     this.onCloseServer_event = function(){
         this.call_event("on_close", []);
+        this.centerproxy.closed();
         this.close_handle.is_close = true;
     }
 

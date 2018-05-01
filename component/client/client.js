@@ -7,7 +7,7 @@ function client(_uuid){
     this.is_enable_heartbeats = false;
     this.tick = new Date().getTime();
 
-    this._process = new process();
+    this._process = new juggle_process();
     var _module = new gate_call_client_module();
     this._process.reg_module(_module);
     _module.add_event_listen("connect_gate_sucess", this, function(){
@@ -67,7 +67,7 @@ function client(_uuid){
                 this.call_event("on_disconnect", []);
                 return;
             }
-        
+
             this.client_call_gate.heartbeats(now);
         }
         this.tick = now;

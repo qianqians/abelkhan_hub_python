@@ -32,9 +32,9 @@ function Imodule(module_name){
         current_ch = null;
     }
 }
-function process(){
+function juggle_process(){
     this.module_set = {};
-    
+
     this.event_set = new Array();
     this.add_event = new Array();
     this.remove_event = new Array();
@@ -50,7 +50,7 @@ function process(){
     this.reg_module = function(_module){
 		this.module_set[_module.module_name] = _module;
     }
-    
+
     this.poll = function(){
         for(ch in this.add_event)
         {
@@ -324,7 +324,7 @@ function client(_uuid){
     this.is_enable_heartbeats = false;
     this.tick = new Date().getTime();
 
-    this._process = new process();
+    this._process = new juggle_process();
     var _module = new gate_call_client_module();
     this._process.reg_module(_module);
     _module.add_event_listen("connect_gate_sucess", this, function(){
@@ -384,7 +384,7 @@ function client(_uuid){
                 this.call_event("on_disconnect", []);
                 return;
             }
-        
+
             this.client_call_gate.heartbeats(now);
         }
         this.tick = now;

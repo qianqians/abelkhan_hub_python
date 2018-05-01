@@ -9,9 +9,9 @@ juggle_js = ['./tools/juggle/js/eventobj.js', './tools/juggle/js/Icaller.js', '.
 service_web_js = ['./service_web/channel.js', './service_web/connectservice.js', './service_web/juggleservice.js']
 service_node_js = ['./service_node_js/channel.js', './service_node_js/acceptservice.js', './service_node_js/connectservice.js', './service_node_js/juggleservice.js']
 protcol_client_js = ['./protcol/caller/client_call_gatecaller.js', './protcol/module/gate_call_clientmodule.js']
-protcol_hub_js = ['./protcol/caller/centercaller.js', './protcol/caller/hub_call_dbproxycaller.js', 
+protcol_hub_js = ['./protcol/caller/centercaller.js', './protcol/caller/hub_call_centercaller.js', './protcol/caller/hub_call_dbproxycaller.js', 
                   './protcol/caller/hub_call_gatecaller.js', './protcol/caller/hub_call_hubcaller.js',
-                  './protcol/module/center_call_hubmodule.js', './protcol/module/center_call_servermodule.js', 
+                  './protcol/module/center_call_hubmodule.js', './protcol/module/center_call_servermodule.js',
                   './protcol/module/dbproxy_call_hubmodule.js', './protcol/module/gate_call_hubmodule.js', './protcol/module/hub_call_hubmodule.js']
 module_js = ['./module/modulemng.js']
 client_js = ['./component/client/client.js']
@@ -30,7 +30,7 @@ def read_file(file_list, codes):
 
 def build_web_client():
         codes = []
-        
+
         read_file(juggle_js, codes)
         read_file(event_closure_js, codes)
         read_file(service_web_js, codes)
@@ -42,7 +42,7 @@ def build_web_client():
 
 def build_node_js_hub():
         codes = []
-        
+
         read_file(juggle_js, codes)
         read_file(event_closure_js, codes)
         read_file(service_node_js, codes)
@@ -56,9 +56,9 @@ def build_node_js_hub():
 
 def build():
         codes = build_web_client()
-        open('./build/client.js', 'w').write('%s' % ''.join(codes))  
+        open('./build/client.js', 'w').write('%s' % ''.join(codes))
         codes = build_node_js_hub()
-        open('./build/hub.js', 'w').write('%s' % ''.join(codes))  
+        open('./build/hub.js', 'w').write('%s' % ''.join(codes))
 
 if __name__ == '__main__':
         build()
