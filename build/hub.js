@@ -709,25 +709,27 @@ function dbproxyproxy(ch){
     }
 
     this.begin_callback = function(callbackid){
-		if (callback_set[callbackid]){
-			return callback_set[callbackid];
+		if (this.callback_set[callbackid]){
+			return this.callback_set[callbackid];
 		}
 
 		return null;
 	}
 
 	this.end_callback = function(callbackid){
-		if (callback_set[callbackid])
+		if (this.callback_set[callbackid])
 		{
-			delete callback_set[callbackid];
+			delete this.callback_set[callbackid];
 		}
 	}
 
     this.end_get_object_info_callback = function(callbackid){
-        end_callback(callbackid);
+        this.end_callback(callbackid);
 
-        if (end_cb_set[callbackid]){
-            return end_cb_set[callbackid];
+        if (this.end_cb_set[callbackid]){
+            var cb = this.end_cb_set[callbackid];
+            delete this.end_cb_set[callbackid];
+            return cb;
         }
 
         return null;
