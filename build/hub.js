@@ -168,7 +168,7 @@ function channel(_sock){
     this.push = function(event){
         var json_str = JSON.stringify(event);
 
-        var send_data = new Buffer(4 + json_str.length);
+        var send_data = Buffer.alloc(4 + json_str.length);
         send_data.writeUInt8(json_str.length & 0xff, 0);
         send_data.writeUInt8((json_str.length >> 8) & 0xff, 1);
         send_data.writeUInt8((json_str.length >> 16) & 0xff, 2);
