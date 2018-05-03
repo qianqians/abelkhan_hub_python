@@ -826,19 +826,19 @@ function gatemng(conn, hub){
         this.clients[client_uuid] = gate_ch.gateproxy;
         gate_ch.gateproxy.connect_sucess(client_uuid);
 
-        this.call_event("client_connect", [client_uuid]);
+        hub.call_event("client_connect", [client_uuid]);
     }
 
     this.client_disconnect = function(client_uuid){
         if (this.clients[client_uuid]){
-            this.call_event("client_disconnect", [client_uuid]);
+            hub.call_event("client_disconnect", [client_uuid]);
 
             delete this.clients[client_uuid];
         }
     }
 
     this.client_exception = function(client_uuid){
-        this.call_event("client_exception", [client_uuid]);
+        hub.call_event("client_exception", [client_uuid]);
     }
 
     this.disconnect_client = function(uuid){
@@ -851,7 +851,7 @@ function gatemng(conn, hub){
     this.call_client = function(uuid, _module, func){
 		if (this.clients[uuid]){
             this.clients[uuid].forward_hub_call_client(uuid, _module, func, [].slice.call(arguments, 3));
-        }  
+        }
     }
 
     this.call_group_client = function(uuids, _module, func){
