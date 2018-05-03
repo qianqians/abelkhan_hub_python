@@ -636,6 +636,7 @@ function dbproxy_msg_handle(_hub){
     this.ack_get_object_count = function( callbackid,  count ){
         var cb = this.hub.dbproxy.begin_callback(callbackid);
         cb(count);
+        this.hub.dbproxy.end_callback(callbackid);
     }
 
 	this.ack_get_object_info = function( callbackid, json_obejct_array ){
@@ -651,6 +652,7 @@ function dbproxy_msg_handle(_hub){
     this.ack_remove_object = function( callbackid ){
         var cb = this.hub.dbproxy.begin_callback(callbackid);
         cb();
+        this.hub.dbproxy.end_callback(callbackid);
     }
 }
 function dbproxyproxy(ch){
