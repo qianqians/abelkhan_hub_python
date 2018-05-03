@@ -446,8 +446,8 @@ function dbproxy_call_hub_module(){
         this.call_event("reg_hub_sucess", []);
     }
 
-    this.ack_create_persisted_object = function(argv0){
-        this.call_event("ack_create_persisted_object", [argv0]);
+    this.ack_create_persisted_object = function(argv0, argv1){
+        this.call_event("ack_create_persisted_object", [argv0, argv1]);
     }
 
     this.ack_updata_persisted_object = function(argv0){
@@ -621,9 +621,9 @@ function dbproxy_msg_handle(_hub){
         this.hub.onConnectDB_event();
     }
     
-    this.ack_create_persisted_object = function( callbackid ){
+    this.ack_create_persisted_object = function( callbackid, is_create_sucess ){
 		var cb = this.hub.dbproxy.begin_callback(callbackid);
-		cb();
+		cb(is_create_sucess);
 		this.hub.dbproxy.end_callback(callbackid);
 	}
 
@@ -635,12 +635,12 @@ function dbproxy_msg_handle(_hub){
 
     this.ack_get_object_count = function( callbackid,  count ){
         var cb = this.hub.dbproxy.begin_callback(callbackid);
-        cb.call(null, count);
+        cb(count);
     }
 
 	this.ack_get_object_info = function( callbackid, json_obejct_array ){
 		var cb = this.hub.dbproxy.begin_callback(callbackid);
-		cb.call(null, json_obejct_array);
+		cb(json_obejct_array);
 	}
 
 	this.ack_get_object_info_end = function( callbackid ){

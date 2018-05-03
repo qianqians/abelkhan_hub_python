@@ -6,9 +6,9 @@ function dbproxy_msg_handle(_hub){
         this.hub.onConnectDB_event();
     }
     
-    this.ack_create_persisted_object = function( callbackid ){
+    this.ack_create_persisted_object = function( callbackid, is_create_sucess ){
 		var cb = this.hub.dbproxy.begin_callback(callbackid);
-		cb();
+		cb(is_create_sucess);
 		this.hub.dbproxy.end_callback(callbackid);
 	}
 
@@ -20,12 +20,12 @@ function dbproxy_msg_handle(_hub){
 
     this.ack_get_object_count = function( callbackid,  count ){
         var cb = this.hub.dbproxy.begin_callback(callbackid);
-        cb.call(null, count);
+        cb(count);
     }
 
 	this.ack_get_object_info = function( callbackid, json_obejct_array ){
 		var cb = this.hub.dbproxy.begin_callback(callbackid);
-		cb.call(null, json_obejct_array);
+		cb(json_obejct_array);
 	}
 
 	this.ack_get_object_info_end = function( callbackid ){

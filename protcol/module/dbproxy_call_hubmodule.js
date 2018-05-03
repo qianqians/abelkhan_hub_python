@@ -7,8 +7,8 @@ function dbproxy_call_hub_module(){
         this.call_event("reg_hub_sucess", []);
     }
 
-    this.ack_create_persisted_object = function(argv0){
-        this.call_event("ack_create_persisted_object", [argv0]);
+    this.ack_create_persisted_object = function(argv0, argv1){
+        this.call_event("ack_create_persisted_object", [argv0, argv1]);
     }
 
     this.ack_updata_persisted_object = function(argv0){
