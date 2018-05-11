@@ -559,7 +559,7 @@ module.exports.config = config;function configLogger(logfilepath, _level){
         appenders: {
             normal: {
                 type: 'file',
-                filename: logfilepath, 
+                filename: logfilepath,
                 maxLogSize: 1024*32,
                 backups: 3,
             }
@@ -571,7 +571,9 @@ module.exports.config = config;function configLogger(logfilepath, _level){
 function getLogger(){
     var log4js = require('log4js');
     return log4js.getLogger('normal');
-}function center_msg_handle(_hub_, _centerproxy_){
+}
+module.exports.getLogger = getLogger;
+function center_msg_handle(_hub_, _centerproxy_){
     this.hub = _hub_;
     this._centerproxy = _centerproxy_;
 
@@ -1003,6 +1005,7 @@ function hub(argvs){
 
     var juggle_service = this.juggle_service;
     var that = this;
+    var time_now = Date.now();
     this.poll = function(){
         try {
             juggle_service.poll();
@@ -1011,10 +1014,17 @@ function hub(argvs){
             getLogger().error(err);
         }
 
-        if (!that.close_handle.is_close){
-            setImmediate(that.poll);
+        if (that.close_handle.is_close){
+            setTimeout(function(){process.exit();}, 1000);
         }else{
-            process.exit();
+            var _tmp_now = Date.now();
+            var _tick_time = _tmp_now - time_now;
+            time_now = _tmp_now;
+            if (_tick_time < 50){
+                setTimeout(that.poll, 5);
+            }else{
+                setImmediate(that.poll);
+            }
         }
 
     }

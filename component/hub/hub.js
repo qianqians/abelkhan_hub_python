@@ -84,6 +84,7 @@ function hub(argvs){
 
     var juggle_service = this.juggle_service;
     var that = this;
+    var time_now = Date.now();
     this.poll = function(){
         try {
             juggle_service.poll();
@@ -92,10 +93,17 @@ function hub(argvs){
             getLogger().error(err);
         }
 
-        if (!that.close_handle.is_close){
-            setImmediate(that.poll);
+        if (that.close_handle.is_close){
+            setTimeout(function(){process.exit();}, 1000);
         }else{
-            process.exit();
+            var _tmp_now = Date.now();
+            var _tick_time = _tmp_now - time_now;
+            time_now = _tmp_now;
+            if (_tick_time < 50){
+                setTimeout(that.poll, 5);
+            }else{
+                setImmediate(that.poll);
+            }
         }
 
     }
