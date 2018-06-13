@@ -22,16 +22,6 @@ function client_call_gate_caller(ch){
         this.call_module_method.call(this, "disable_heartbeats", _argv);
     }
 
-    this.connect_hub = function( argv0, argv1){
-        var _argv = [argv0,argv1];
-        this.call_module_method.call(this, "connect_hub", _argv);
-    }
-
-    this.disconnect_hub = function( argv0, argv1){
-        var _argv = [argv0,argv1];
-        this.call_module_method.call(this, "disconnect_hub", _argv);
-    }
-
     this.forward_client_call_hub = function( argv0, argv1, argv2, argv3){
         var _argv = [argv0,argv1,argv2,argv3];
         this.call_module_method.call(this, "forward_client_call_hub", _argv);

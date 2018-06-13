@@ -89,8 +89,23 @@ function gatemng(conn, hub){
 
     this.call_group_client = function(uuids, _module, func){
         var argvs = [].slice.call(arguments, 3)
-		for(let uuid in this.gates){
-			this.gates[uuid].forward_hub_call_group_client(uuids, _module, func, argvs);
+
+        let tmp_gates = [];
+        for(let uuid of uuids){
+            let tmp_proxy = this.clients[uuid];
+            if (!tmp_proxy){
+                continue;
+            }
+
+            if (tmp_proxy in tmp_gates){
+                continue;
+            }
+
+            tmp_gates.push(tmp_proxy);
+        }
+
+		for(let gate_proxy of tmp_gates){
+			gate_proxy.forward_hub_call_group_client(uuids, _module, func, argvs);
 		}
 	}
 

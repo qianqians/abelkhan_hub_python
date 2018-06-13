@@ -10,15 +10,12 @@ function client(_uuid){
     this._process = new juggle_process();
     var _module = new gate_call_client_module();
     this._process.reg_module(_module);
-    _module.add_event_listen("connect_gate_sucess", this, function(){
+    _module.add_event_listen("connect_server_sucess", this, function(){
         this.is_conn_gate = true;
         this.heartbeats_time = new Date().getTime();
         this.client_call_gate.heartbeats(new Date().getTime());
 
-        this.call_event("on_connect_gate", []);
-    });
-    _module.add_event_listen("connect_hub_sucess", this, function(hub_name){
-        this.call_event("on_connect_hub", [hub_name]);
+        this.call_event("on_connect_server", []);
     });
     _module.add_event_listen("ack_heartbeats", this, function(){
         this.heartbeats_time = new Date().getTime();
@@ -46,10 +43,6 @@ function client(_uuid){
 
         this.is_enable_heartbeats = true;
         this.heartbeats_time = new Date().getTime();
-    }
-
-    this.connect_hub = function(hub_name){
-        this.client_call_gate.connect_hub(this.uuid, hub_name);
     }
 
     this.call_hub = function(hub_name, module_name, func_name){
