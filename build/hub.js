@@ -167,13 +167,14 @@ function channel(_sock){
     
     this.push = function(event){
         var json_str = JSON.stringify(event);
+        var json_buff = Buffer.from(json_str, 'utf-8');
 
-        var send_data = Buffer.alloc(4 + json_str.length);
-        send_data.writeUInt8(json_str.length & 0xff, 0);
-        send_data.writeUInt8((json_str.length >> 8) & 0xff, 1);
-        send_data.writeUInt8((json_str.length >> 16) & 0xff, 2);
-        send_data.writeUInt8((json_str.length >> 24) & 0xff, 3);
-        send_data.write(json_str, 4, 4+json_str.length, 'utf-8');
+        var send_header = Buffer.alloc(4);
+        send_header.writeUInt8(json_buff.length & 0xff, 0);
+        send_header.writeUInt8((json_buff.length >> 8) & 0xff, 1);
+        send_header.writeUInt8((json_buff.length >> 16) & 0xff, 2);
+        send_header.writeUInt8((json_buff.length >> 24) & 0xff, 3);
+        var send_data = Buffer.concat([send_header, json_buff]);
 
         _sock.write(send_data);
 
