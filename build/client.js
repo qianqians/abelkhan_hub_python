@@ -56,9 +56,9 @@ function juggle_process(){
         {
             this.event_set.push(this.add_event[ch]);
         }
-        this.add_event = []
+        this.add_event = [];
 
-        var _new_event_set = [];
+        var _new_event_set = new [];
         for(_ch in this.event_set)
         {
             var in_remove_event = false;
@@ -78,18 +78,19 @@ function juggle_process(){
         this.event_set = _new_event_set;
         this.remove_event = [];
 
-        _new_event_set = [];
+        _new_event_set = new [];
         while(this.event_set.length > 0)
         {
-			var ch = this.event_set.shift();
-            var _event = this.event_set[ch].pop();
+            var ch = this.event_set.shift();
+            
+            var _event = ch.pop();
             if (_event === null)
             {
                 _new_event_set.push(ch);
                 continue;
             }
 
-            this.module_set[_event[0]].process_event(this.event_set[ch], _event);
+            this.module_set[_event[0]].process_event(ch, _event);
             this.event_set.push(ch);
         }
         this.event_set = _new_event_set;
