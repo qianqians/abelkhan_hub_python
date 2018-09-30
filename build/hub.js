@@ -35,9 +35,9 @@ function Imodule(module_name){
 function juggle_process(){
     this.module_set = {};
 
-    this.event_set = [];
-    this.add_event = [];
-    this.remove_event = [];
+    this.event_set = new Array();
+    this.add_event = new Array();
+    this.remove_event = new Array();
 
     this.reg_channel = function(ch){
         this.add_event.push(ch);
@@ -56,9 +56,9 @@ function juggle_process(){
         {
             this.event_set.push(this.add_event[ch]);
         }
-        this.add_event = [];
+        this.add_event = new Array();
 
-        var _new_event_set = new [];
+        var _new_event_set = new Array();
         for(_ch in this.event_set)
         {
             var in_remove_event = false;
@@ -76,32 +76,20 @@ function juggle_process(){
             }
         }
         this.event_set = _new_event_set;
-        this.remove_event = [];
+        this.remove_event = new Array();
 
-        _new_event_set = new [];
-        while(this.event_set.length > 0)
+        for(ch in this.event_set)
         {
-            var ch = this.event_set.shift();
-            
-            var _event = ch.pop();
-            if (_event === null)
-            {
-                _new_event_set.push(ch);
-                continue;
+			while (true)
+			{
+                var _event = this.event_set[ch].pop();
+                if (_event === null)
+                {
+                    break;
+                }
+                this.module_set[_event[0]].process_event(this.event_set[ch], _event);
             }
-            this.module_set[_event[0]].process_event(ch, _event);
-
-            _event = ch.pop();
-            if (_event === null)
-            {
-                _new_event_set.push(ch);
-                continue;
-            }
-            this.module_set[_event[0]].process_event(ch, _event);
-
-            this.event_set.push(ch);
         }
-        this.event_set = _new_event_set;
     }
 }
 function event_closure(){
@@ -601,7 +589,7 @@ function center_msg_handle(_hub_, _centerproxy_){
     
     this.distribute_server_address = function( type,  ip,  port,  uuid ){
 		if (type == "dbproxy") {
-			this.hub.connect_dbproxy (ip, port);
+			//this.hub.connect_dbproxy (ip, port);
 		}
 		if (type == "gate") {
 			this.hub.gates.connect_gate(uuid, ip, port);
@@ -811,6 +799,14 @@ function gateproxy(ch, hub){
 	}
 }
 
+function directproxy(direct_ch){
+    this.caller = new hub_call_client_caller(direct_ch);
+
+    this.call_client = function(module, func, argv){
+        this.caller.call_client(module, func, argv);
+    }
+}
+
 function gatemng(conn, hub){
     eventobj.call(this);
     this.conn = conn;
@@ -821,13 +817,29 @@ function gatemng(conn, hub){
 
 	this.gates = {};
 
+    this.direct_ch = {};
+
     this.connect_gate = function(uuid, ip, port){
 		this.conn.connect(ip, port, this, function(ch){
             this.gates[uuid] = new gateproxy(ch, hub);
             ch.gateproxy = this.gates[uuid];
             this.gates[uuid].reg_hub();
         });
-	}
+    }
+
+    this.client_direct_connect = function(client_uuid, direct_ch){
+        if (this.direct_ch[client_uuid]){
+            return;
+        }
+
+        getLogger().trace("reg direct client:%s", client_uuid);
+
+        direct_ch.directproxy = new directproxy(direct_ch);
+        direct_ch.client_uuid = client_uuid;
+        this.direct_ch[client_uuid] = direct_ch.directproxy;
+
+        hub.call_event("direct_client_connect", [client_uuid]);
+    }
 
     this.client_connect = function(client_uuid, gate_ch){
         if (!gate_ch.gateproxy){
@@ -866,29 +878,37 @@ function gatemng(conn, hub){
     }
 
     this.call_client = function(uuid, _module, func){
+		if (this.direct_ch[uuid] ){
+            this.direct_ch[uuid].call_client(_module, func, [].slice.call(arguments, 3));
+            return;
+        }
+
 		if (this.clients[uuid]){
             this.clients[uuid].forward_hub_call_client(uuid, _module, func, [].slice.call(arguments, 3));
         }
     }
 
     this.call_group_client = function(uuids, _module, func){
-        var argvs = [].slice.call(arguments, 3)
+        var argvs = [].slice.call(arguments, 3);
 
-        let tmp_gates = [];
+        let tmp_uuids = [];
         for(let uuid of uuids){
-            let tmp_proxy = this.clients[uuid];
-            if (!tmp_proxy){
+            if (this.direct_ch[uuid] ){
+                this.direct_ch[uuid].call_client(_module, func, argvs);
                 continue;
             }
 
-            if (tmp_proxy in tmp_gates){
-                continue;
-            }
-
-            tmp_gates.push(tmp_proxy);
+            tmp_uuids.push(uuid);
         }
 
-		for(let gate_proxy of tmp_gates){
+        let tmp_gates = [];
+        for(let uuid of tmp_uuids){
+            if (this.clients[uuid] && tmp_gates.indexOf(this.clients[uuid]) === -1 ){
+                tmp_gates.push(this.clients[uuid]);
+            }
+        }
+
+        for(let gate_proxy of tmp_gates){
 			gate_proxy.forward_hub_call_group_client(uuids, _module, func, argvs);
 		}
 	}
@@ -1000,19 +1020,6 @@ function hub(argvs){
         getLogger().trace("end on connect center");
     });
 
-    var dbproxy_call_hub = new dbproxy_call_hub_module();
-    var _dbproxy_msg_handle = new dbproxy_msg_handle(this);
-    dbproxy_call_hub.add_event_listen("reg_hub_sucess", _dbproxy_msg_handle, _dbproxy_msg_handle.reg_hub_sucess);
-	dbproxy_call_hub.add_event_listen("ack_create_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_create_persisted_object);
-	dbproxy_call_hub.add_event_listen("ack_updata_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_updata_persisted_object);
-    dbproxy_call_hub.add_event_listen("ack_get_object_count", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_count);
-    dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
-	dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
-    dbproxy_call_hub.add_event_listen("ack_remove_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_remove_object);
-    this.dbproxy_process = new juggle_process();
-    this.dbproxy_process.reg_module(dbproxy_call_hub);
-    this.connect_dbproxy_service = new connectservice(this.dbproxy_process);
-
     var gate_call_hub = new gate_call_hub_module();
     var _gate_msg_handle = new gate_msg_handle(this, this.modules);
     gate_call_hub.add_event_listen("reg_hub_sucess", _gate_msg_handle, _gate_msg_handle.reg_hub_sucess);
@@ -1026,9 +1033,51 @@ function hub(argvs){
     this.gates = new gatemng(this.connect_gate_servcie, this);
 
     this.juggle_service = new juggleservice();
+
+    if (this.cfg["dbproxy"]){
+        var dbproxy_call_hub = new dbproxy_call_hub_module();
+        var _dbproxy_msg_handle = new dbproxy_msg_handle(this);
+        dbproxy_call_hub.add_event_listen("reg_hub_sucess", _dbproxy_msg_handle, _dbproxy_msg_handle.reg_hub_sucess);
+        dbproxy_call_hub.add_event_listen("ack_create_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_create_persisted_object);
+        dbproxy_call_hub.add_event_listen("ack_updata_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_updata_persisted_object);
+        dbproxy_call_hub.add_event_listen("ack_get_object_count", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_count);
+        dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
+        dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
+        dbproxy_call_hub.add_event_listen("ack_remove_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_remove_object);
+        this.dbproxy_process = new juggle_process();
+        this.dbproxy_process.reg_module(dbproxy_call_hub);
+        this.connect_dbproxy_service = new connectservice(this.dbproxy_process);
+        this.connect_dbproxy_service.connect(db_ip, db_port, this, function(db_ch){
+            this.dbproxy = new dbproxyproxy(db_ch);
+            this.dbproxy.reg_hub(that.uuid);
+        });
+
+        this.juggle_service.add_process(this.dbproxy_process);
+    }
+
+    if (this.cfg["out_ip"] && this.cfg["out_port"]){
+        let xor_key = this.cfg["key"];
+
+        var _direct_client_msg_handle = new direct_client_msg_handle(this.modules, this);
+        var client_call_hub = new client_call_hub_module();
+        client_call_hub.add_event_listen("client_connect", _direct_client_msg_handle, _direct_client_msg_handle.client_connect);
+        client_call_hub.add_event_listen("call_hub", _direct_client_msg_handle, _direct_client_msg_handle.call_hub);
+        this.direct_client_process = new juggle_process();
+        this.direct_client_process.reg_module(client_call_hub);
+        this.accept_client_service = new acceptservice(this.cfg["out_ip"], this.cfg["out_port"], this.direct_client_process);
+        var that = this;
+        this.accept_client_service.add_event_listen("on_channel_connect", this, (ch)=>{
+            ch.xor_key = xor_key % 256;
+        });
+        this.accept_client_service.add_event_listen("on_channel_disconnect", this, (ch)=>{
+            delete that.gates.direct_ch[ch.client_uuid];
+        });
+
+        this.juggle_service.add_process(this.direct_client_process);
+    }
+
     this.juggle_service.add_process(this.hub_process);
 	this.juggle_service.add_process(this.center_process);
-	this.juggle_service.add_process(this.dbproxy_process);
     this.juggle_service.add_process (this.gate_process);
 
     var juggle_service = this.juggle_service;
@@ -1072,15 +1121,8 @@ function hub(argvs){
     }
 
     var that = this;
-    this.connect_dbproxy = function(db_ip, db_port){
-		this.connect_dbproxy_service.connect(db_ip, db_port, this, function(db_ch){
-			this.dbproxy = new dbproxyproxy(db_ch);
-			this.dbproxy.reg_hub(that.uuid);
-        });
-	}
-
     this.reg_hub = function(hub_ip, hub_port){
-        this.connect_hub_service.connect(hub_ip, hub_port, this, function(ch){
+        that.connect_hub_service.connect(hub_ip, hub_port, that, function(ch){
             var caller = new hub_call_hub_caller(ch);
             caller.reg_hub(that.name);
         });

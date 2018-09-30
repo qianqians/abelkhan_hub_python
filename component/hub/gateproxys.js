@@ -27,6 +27,14 @@ function gateproxy(ch, hub){
 	}
 }
 
+function directproxy(direct_ch){
+    this.caller = new hub_call_client_caller(direct_ch);
+
+    this.call_client = function(module, func, argv){
+        this.caller.call_client(module, func, argv);
+    }
+}
+
 function gatemng(conn, hub){
     eventobj.call(this);
     this.conn = conn;
@@ -37,13 +45,29 @@ function gatemng(conn, hub){
 
 	this.gates = {};
 
+    this.direct_ch = {};
+
     this.connect_gate = function(uuid, ip, port){
 		this.conn.connect(ip, port, this, function(ch){
             this.gates[uuid] = new gateproxy(ch, hub);
             ch.gateproxy = this.gates[uuid];
             this.gates[uuid].reg_hub();
         });
-	}
+    }
+
+    this.client_direct_connect = function(client_uuid, direct_ch){
+        if (this.direct_ch[client_uuid]){
+            return;
+        }
+
+        getLogger().trace("reg direct client:%s", client_uuid);
+
+        direct_ch.directproxy = new directproxy(direct_ch);
+        direct_ch.client_uuid = client_uuid;
+        this.direct_ch[client_uuid] = direct_ch.directproxy;
+
+        hub.call_event("direct_client_connect", [client_uuid]);
+    }
 
     this.client_connect = function(client_uuid, gate_ch){
         if (!gate_ch.gateproxy){
@@ -82,29 +106,37 @@ function gatemng(conn, hub){
     }
 
     this.call_client = function(uuid, _module, func){
+		if (this.direct_ch[uuid] ){
+            this.direct_ch[uuid].call_client(_module, func, [].slice.call(arguments, 3));
+            return;
+        }
+
 		if (this.clients[uuid]){
             this.clients[uuid].forward_hub_call_client(uuid, _module, func, [].slice.call(arguments, 3));
         }
     }
 
     this.call_group_client = function(uuids, _module, func){
-        var argvs = [].slice.call(arguments, 3)
+        var argvs = [].slice.call(arguments, 3);
 
-        let tmp_gates = [];
+        let tmp_uuids = [];
         for(let uuid of uuids){
-            let tmp_proxy = this.clients[uuid];
-            if (!tmp_proxy){
+            if (this.direct_ch[uuid] ){
+                this.direct_ch[uuid].call_client(_module, func, argvs);
                 continue;
             }
 
-            if (tmp_proxy in tmp_gates){
-                continue;
-            }
-
-            tmp_gates.push(tmp_proxy);
+            tmp_uuids.push(uuid);
         }
 
-		for(let gate_proxy of tmp_gates){
+        let tmp_gates = [];
+        for(let uuid of tmp_uuids){
+            if (this.clients[uuid] && tmp_gates.indexOf(this.clients[uuid]) === -1 ){
+                tmp_gates.push(this.clients[uuid]);
+            }
+        }
+
+        for(let gate_proxy of tmp_gates){
 			gate_proxy.forward_hub_call_group_client(uuids, _module, func, argvs);
 		}
 	}

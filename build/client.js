@@ -35,9 +35,9 @@ function Imodule(module_name){
 function juggle_process(){
     this.module_set = {};
 
-    this.event_set = [];
-    this.add_event = [];
-    this.remove_event = [];
+    this.event_set = new Array();
+    this.add_event = new Array();
+    this.remove_event = new Array();
 
     this.reg_channel = function(ch){
         this.add_event.push(ch);
@@ -56,9 +56,9 @@ function juggle_process(){
         {
             this.event_set.push(this.add_event[ch]);
         }
-        this.add_event = [];
+        this.add_event = new Array();
 
-        var _new_event_set = new [];
+        var _new_event_set = new Array();
         for(_ch in this.event_set)
         {
             var in_remove_event = false;
@@ -76,32 +76,20 @@ function juggle_process(){
             }
         }
         this.event_set = _new_event_set;
-        this.remove_event = [];
+        this.remove_event = new Array();
 
-        _new_event_set = new [];
-        while(this.event_set.length > 0)
+        for(ch in this.event_set)
         {
-            var ch = this.event_set.shift();
-            
-            var _event = ch.pop();
-            if (_event === null)
-            {
-                _new_event_set.push(ch);
-                continue;
+			while (true)
+			{
+                var _event = this.event_set[ch].pop();
+                if (_event === null)
+                {
+                    break;
+                }
+                this.module_set[_event[0]].process_event(this.event_set[ch], _event);
             }
-            this.module_set[_event[0]].process_event(ch, _event);
-
-            _event = ch.pop();
-            if (_event === null)
-            {
-                _new_event_set.push(ch);
-                continue;
-            }
-            this.module_set[_event[0]].process_event(ch, _event);
-
-            this.event_set.push(ch);
         }
-        this.event_set = _new_event_set;
     }
 }
 function event_closure(){

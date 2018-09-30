@@ -51,19 +51,6 @@ function hub(argvs){
         getLogger().trace("end on connect center");
     });
 
-    var dbproxy_call_hub = new dbproxy_call_hub_module();
-    var _dbproxy_msg_handle = new dbproxy_msg_handle(this);
-    dbproxy_call_hub.add_event_listen("reg_hub_sucess", _dbproxy_msg_handle, _dbproxy_msg_handle.reg_hub_sucess);
-	dbproxy_call_hub.add_event_listen("ack_create_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_create_persisted_object);
-	dbproxy_call_hub.add_event_listen("ack_updata_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_updata_persisted_object);
-    dbproxy_call_hub.add_event_listen("ack_get_object_count", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_count);
-    dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
-	dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
-    dbproxy_call_hub.add_event_listen("ack_remove_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_remove_object);
-    this.dbproxy_process = new juggle_process();
-    this.dbproxy_process.reg_module(dbproxy_call_hub);
-    this.connect_dbproxy_service = new connectservice(this.dbproxy_process);
-
     var gate_call_hub = new gate_call_hub_module();
     var _gate_msg_handle = new gate_msg_handle(this, this.modules);
     gate_call_hub.add_event_listen("reg_hub_sucess", _gate_msg_handle, _gate_msg_handle.reg_hub_sucess);
@@ -77,9 +64,51 @@ function hub(argvs){
     this.gates = new gatemng(this.connect_gate_servcie, this);
 
     this.juggle_service = new juggleservice();
+
+    if (this.cfg["dbproxy"]){
+        var dbproxy_call_hub = new dbproxy_call_hub_module();
+        var _dbproxy_msg_handle = new dbproxy_msg_handle(this);
+        dbproxy_call_hub.add_event_listen("reg_hub_sucess", _dbproxy_msg_handle, _dbproxy_msg_handle.reg_hub_sucess);
+        dbproxy_call_hub.add_event_listen("ack_create_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_create_persisted_object);
+        dbproxy_call_hub.add_event_listen("ack_updata_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_updata_persisted_object);
+        dbproxy_call_hub.add_event_listen("ack_get_object_count", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_count);
+        dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
+        dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
+        dbproxy_call_hub.add_event_listen("ack_remove_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_remove_object);
+        this.dbproxy_process = new juggle_process();
+        this.dbproxy_process.reg_module(dbproxy_call_hub);
+        this.connect_dbproxy_service = new connectservice(this.dbproxy_process);
+        this.connect_dbproxy_service.connect(db_ip, db_port, this, function(db_ch){
+            this.dbproxy = new dbproxyproxy(db_ch);
+            this.dbproxy.reg_hub(that.uuid);
+        });
+
+        this.juggle_service.add_process(this.dbproxy_process);
+    }
+
+    if (this.cfg["out_ip"] && this.cfg["out_port"]){
+        let xor_key = this.cfg["key"];
+
+        var _direct_client_msg_handle = new direct_client_msg_handle(this.modules, this);
+        var client_call_hub = new client_call_hub_module();
+        client_call_hub.add_event_listen("client_connect", _direct_client_msg_handle, _direct_client_msg_handle.client_connect);
+        client_call_hub.add_event_listen("call_hub", _direct_client_msg_handle, _direct_client_msg_handle.call_hub);
+        this.direct_client_process = new juggle_process();
+        this.direct_client_process.reg_module(client_call_hub);
+        this.accept_client_service = new acceptservice(this.cfg["out_ip"], this.cfg["out_port"], this.direct_client_process);
+        var that = this;
+        this.accept_client_service.add_event_listen("on_channel_connect", this, (ch)=>{
+            ch.xor_key = xor_key % 256;
+        });
+        this.accept_client_service.add_event_listen("on_channel_disconnect", this, (ch)=>{
+            delete that.gates.direct_ch[ch.client_uuid];
+        });
+
+        this.juggle_service.add_process(this.direct_client_process);
+    }
+
     this.juggle_service.add_process(this.hub_process);
 	this.juggle_service.add_process(this.center_process);
-	this.juggle_service.add_process(this.dbproxy_process);
     this.juggle_service.add_process (this.gate_process);
 
     var juggle_service = this.juggle_service;
@@ -123,15 +152,8 @@ function hub(argvs){
     }
 
     var that = this;
-    this.connect_dbproxy = function(db_ip, db_port){
-		this.connect_dbproxy_service.connect(db_ip, db_port, this, function(db_ch){
-			this.dbproxy = new dbproxyproxy(db_ch);
-			this.dbproxy.reg_hub(that.uuid);
-        });
-	}
-
     this.reg_hub = function(hub_ip, hub_port){
-        this.connect_hub_service.connect(hub_ip, hub_port, this, function(ch){
+        that.connect_hub_service.connect(hub_ip, hub_port, that, function(ch){
             var caller = new hub_call_hub_caller(ch);
             caller.reg_hub(that.name);
         });
