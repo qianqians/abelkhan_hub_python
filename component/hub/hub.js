@@ -9,13 +9,16 @@ function hub(argvs){
     if (argvs.length > 1){
         this.cfg = cfg[argvs[1]];
     }
-
-    configLogger(this.cfg["log_dir"] + '\\' + this.cfg["log_file"], this.cfg["log_level"]);
-    getLogger().trace("config logger!");
+    this.root_cfg = cfg;
 
     this.name = this.cfg["hub_name"];
 
+    var path = require('path');
+    configLogger(path.join(this.cfg["log_dir"], this.cfg["log_file"]), this.cfg["log_level"]);
+    getLogger().trace("config logger!");
+
     this.modules = new modulemng();
+
     this.close_handle = new closehandle();
     this.hubs = new hubmng();
 
@@ -65,27 +68,6 @@ function hub(argvs){
 
     this.juggle_service = new juggleservice();
 
-    if (this.cfg["dbproxy"]){
-        var dbproxy_call_hub = new dbproxy_call_hub_module();
-        var _dbproxy_msg_handle = new dbproxy_msg_handle(this);
-        dbproxy_call_hub.add_event_listen("reg_hub_sucess", _dbproxy_msg_handle, _dbproxy_msg_handle.reg_hub_sucess);
-        dbproxy_call_hub.add_event_listen("ack_create_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_create_persisted_object);
-        dbproxy_call_hub.add_event_listen("ack_updata_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_updata_persisted_object);
-        dbproxy_call_hub.add_event_listen("ack_get_object_count", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_count);
-        dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
-        dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
-        dbproxy_call_hub.add_event_listen("ack_remove_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_remove_object);
-        this.dbproxy_process = new juggle_process();
-        this.dbproxy_process.reg_module(dbproxy_call_hub);
-        this.connect_dbproxy_service = new connectservice(this.dbproxy_process);
-        this.connect_dbproxy_service.connect(db_ip, db_port, this, function(db_ch){
-            this.dbproxy = new dbproxyproxy(db_ch);
-            this.dbproxy.reg_hub(that.uuid);
-        });
-
-        this.juggle_service.add_process(this.dbproxy_process);
-    }
-
     if (this.cfg["out_ip"] && this.cfg["out_port"]){
         let xor_key = this.cfg["key"];
 
@@ -111,34 +93,43 @@ function hub(argvs){
 	this.juggle_service.add_process(this.center_process);
     this.juggle_service.add_process (this.gate_process);
 
+    this.is_busy = false;
     var juggle_service = this.juggle_service;
     var that = this;
     var time_now = Date.now();
     this.poll = function(){
         try {
             juggle_service.poll();
+
+            that.call_event("on_tick", []);
         }
         catch(err) {
             getLogger().error(err);
         }
 
         if (that.close_handle.is_close){
-            setTimeout(function(){process.exit();}, 1000);
+            setTimeout(()=>{process.exit()}, 2000);
         }else{
             var _tmp_now = Date.now();
-            var _tick_time = _tmp_now - time_now;
+            var _tmp_time = _tmp_now - time_now;
             time_now = _tmp_now;
-            if (_tick_time < 50){
+            if (_tmp_time < 50){
+                that.is_busy = false;
                 setTimeout(that.poll, 5);
-            }else{
+            }
+            else{
+                that.is_busy = true;
                 setImmediate(that.poll);
             }
         }
-
     }
 
     this.onConnectDB_event = function(){
         this.call_event("on_connect_db", []);
+    }
+
+    this.onConnectCenter_event = function(){
+        this.call_event("on_connect_center", []);
     }
 
     this.onCloseServer_event = function(){
@@ -157,7 +148,38 @@ function hub(argvs){
             var caller = new hub_call_hub_caller(ch);
             caller.reg_hub(that.name);
         });
-    }
+    };
+
+    this.try_connect_db = function(dbproxy_ip, dbproxy_port){
+        if (!this.cfg["dbproxy"]){
+            return;
+        }
+
+        this.dbproxy_cfg = this.root_cfg[this.cfg["dbproxy"]];
+        if (dbproxy_ip != this.dbproxy_cfg["ip"] || dbproxy_port != this.dbproxy_cfg["port"]){
+            return;
+        }
+
+        var dbproxy_call_hub = new dbproxy_call_hub_module();
+        var _dbproxy_msg_handle = new dbproxy_msg_handle(this);
+        dbproxy_call_hub.add_event_listen("reg_hub_sucess", _dbproxy_msg_handle, _dbproxy_msg_handle.reg_hub_sucess);
+        dbproxy_call_hub.add_event_listen("ack_create_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_create_persisted_object);
+        dbproxy_call_hub.add_event_listen("ack_updata_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_updata_persisted_object);
+        dbproxy_call_hub.add_event_listen("ack_find_and_modify_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_find_and_modify_persisted_object);
+        dbproxy_call_hub.add_event_listen("ack_get_object_count", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_count);
+        dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
+        dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
+        dbproxy_call_hub.add_event_listen("ack_remove_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_remove_object);
+        this.dbproxy_process = new juggle_process();
+        this.dbproxy_process.reg_module(dbproxy_call_hub);
+        this.connect_dbproxy_service = new connectservice(this.dbproxy_process);
+        this.connect_dbproxy_service.connect(this.dbproxy_cfg["ip"], this.dbproxy_cfg["port"], this, function(db_ch){
+            this.dbproxy = new dbproxyproxy(db_ch);
+            this.dbproxy.reg_hub(that.uuid);
+        });
+
+        this.juggle_service.add_process(this.dbproxy_process);
+    };
 }
 module.exports.hub = hub;
 module.exports.event_cb = event_closure;
