@@ -7,7 +7,8 @@ import os
 
 juggle_js = ['./tools/juggle/js/eventobj.js', './tools/juggle/js/Icaller.js', './tools/juggle/js/Imodule.js', './tools/juggle/js/process.js']
 service_web_js = ['./service_web/channel.js', './service_web/connectservice.js', './service_web/juggleservice.js']
-service_node_js = ['./service_node_js/channel.js', './service_node_js/acceptservice.js', './service_node_js/connectservice.js', './service_node_js/juggleservice.js']
+service_node_js = ['./service_node_js/channel.js', './service_node_js/acceptservice.js', './service_node_js/connectservice.js',
+                   './service_node_js/udpchannel.js', './service_node_js/udpservice.js', './service_node_js/udpprotocol.js', './service_node_js/juggleservice.js']
 protcol_client_js = ['./protcol/caller/client_call_gatecaller.js', './protcol/module/gate_call_clientmodule.js']
 protcol_hub_js = ['./protcol/caller/centercaller.js', './protcol/caller/hub_call_centercaller.js', './protcol/caller/hub_call_dbproxycaller.js', 
                   './protcol/caller/hub_call_gatecaller.js', './protcol/caller/hub_call_hubcaller.js',

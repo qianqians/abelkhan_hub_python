@@ -12,6 +12,11 @@ function client_call_gate_caller(ch){
         this.call_module_method.call(this, "cancle_server", _argv);
     }
 
+    this.connect_hub = function( argv0){
+        var _argv = [argv0];
+        this.call_module_method.call(this, "connect_hub", _argv);
+    }
+
     this.enable_heartbeats = function(){
         var _argv = [];
         this.call_module_method.call(this, "enable_heartbeats", _argv);

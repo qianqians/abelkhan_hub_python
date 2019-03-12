@@ -7,7 +7,7 @@ import sys
 sys.path.append('../3rdparty/')
 
 from flask import *
-from flask.ext.cors import CORS
+from flask_cors import CORS
 
 from websearchapp import *
 from client import *

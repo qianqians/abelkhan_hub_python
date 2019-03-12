@@ -20,7 +20,7 @@ function hub(argvs){
     this.modules = new modulemng();
 
     this.close_handle = new closehandle();
-    this.hubs = new hubmng();
+    this.hubs = new hubmng(this);
 
     var _hub_msg_handle = new hub_msg_handle(this.modules, this.hubs);
     var hub_call_hub = new hub_call_hub_module();
@@ -29,8 +29,8 @@ function hub(argvs){
     hub_call_hub.add_event_listen("hub_call_hub_mothed", _hub_msg_handle, _hub_msg_handle.hub_call_hub_mothed);
     this.hub_process = new juggle_process();
     this.hub_process.reg_module(hub_call_hub);
-    this.accept_hub_service = new acceptservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
-    this.connect_hub_service = new connectservice(this.hub_process);
+    this.hub_service = new udpservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
+    //this.connect_hub_service = new connectservice(this.hub_process);
 
     this.center_process = new juggle_process();
     this.connect_center_service = new connectservice(this.center_process);
@@ -144,7 +144,7 @@ function hub(argvs){
 
     var that = this;
     this.reg_hub = function(hub_ip, hub_port){
-        that.connect_hub_service.connect(hub_ip, hub_port, that, function(ch){
+        that.hub_service.connect(hub_ip, hub_port, (ch)=>{
             var caller = new hub_call_hub_caller(ch);
             caller.reg_hub(that.name);
         });

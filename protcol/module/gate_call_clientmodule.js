@@ -3,8 +3,16 @@ function gate_call_client_module(){
     eventobj.call(this);
     Imodule.call(this, "gate_call_client");
 
-    this.connect_server_sucess = function(){
-        this.call_event("connect_server_sucess", []);
+    this.ntf_uuid = function(argv0){
+        this.call_event("ntf_uuid", [argv0]);
+    }
+
+    this.connect_gate_sucess = function(){
+        this.call_event("connect_gate_sucess", []);
+    }
+
+    this.connect_hub_sucess = function(argv0){
+        this.call_event("connect_hub_sucess", [argv0]);
     }
 
     this.ack_heartbeats = function(){

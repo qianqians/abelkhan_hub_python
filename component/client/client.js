@@ -1,7 +1,7 @@
-function client(_uuid){
+function client(){
     event_closure.call(this);
 
-    this.uuid = _uuid;
+    //this.uuid = _uuid;
     this.modules = new modulemng();
     this.is_conn_gate = false;
     this.is_enable_heartbeats = false;
@@ -10,12 +10,19 @@ function client(_uuid){
     this._process = new juggle_process();
     var _module = new gate_call_client_module();
     this._process.reg_module(_module);
-    _module.add_event_listen("connect_server_sucess", this, function(){
+    _module.add_event_listen("ntf_uuid", this, function(uuid){
+        this.uuid = uuid;
+        this.client_call_gate.connect_server(this.uuid, new Date().getTime());
+    });
+    _module.add_event_listen("connect_gate_sucess", this, function(){
         this.is_conn_gate = true;
         this.heartbeats_time = new Date().getTime();
         this.client_call_gate.heartbeats(new Date().getTime());
 
-        this.call_event("on_connect_server", []);
+        this.call_event("on_connect_gate", []);
+    });
+    _module.add_event_listen("connect_hub_sucess", this, function(hub_name){
+        this.call_event("on_connect_hub", [hub_name]);
     });
     _module.add_event_listen("ack_heartbeats", this, function(){
         this.heartbeats_time = new Date().getTime();
@@ -34,8 +41,12 @@ function client(_uuid){
         this.ch = this.conn.connect(url);
         this.ch.add_event_listen("onopen", this, function(){
             this.client_call_gate = new client_call_gate_caller(this.ch);
-            this.client_call_gate.connect_server(this.uuid, new Date().getTime());
+            //this.client_call_gate.connect_server(this.uuid, new Date().getTime());
         });
+    }
+
+    this.connect_hub = function(hub_name){
+        this.client_call_gate.connect_hub(hub_name);
     }
 
     this.enable_heartbeats = function(){
@@ -72,3 +83,4 @@ function client(_uuid){
         juggle_service.poll();
     }
 }
+module.exports.client = client;

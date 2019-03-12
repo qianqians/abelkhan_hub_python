@@ -1,0 +1,676 @@
+2019-03-11T20:39:35.559 TRACE config logger!
+
+2019-03-11T20:39:35.565 TRACE begin connect host:127.0.0.1, port:1234
+
+2019-03-11T20:39:35.569 TRACE connectting host:127.0.0.1, port:1234
+
+2019-03-11T20:39:35.570 TRACE begin on connect center
+
+2019-03-11T20:39:35.571 TRACE ["center","reg_server",["hub","127.0.0.1",4234,"ba1c1b80-43fa-11e9-bb90-b5ff0368d642"]]
+
+2019-03-11T20:39:35.571 TRACE end on connect center
+
+2019-03-11T20:39:35.571 TRACE end connect host:127.0.0.1, port:1234
+
+2019-03-11T20:39:35.615 TRACE begin on data
+
+2019-03-11T20:39:35.615 TRACE ["center_call_hub","distribute_server_address",["gate","127.0.0.1",1236,"64390e7c-8c0b-457d-8666-333f265f9c30"]]
+
+2019-03-11T20:39:35.616 TRACE end on data
+
+2019-03-11T20:39:35.619 TRACE begin connect host:127.0.0.1, port:1236
+
+2019-03-11T20:39:35.620 TRACE connectting host:127.0.0.1, port:1236
+
+2019-03-11T20:39:35.621 TRACE ["hub_call_gate","reg_hub",["ba1c1b80-43fa-11e9-bb90-b5ff0368d642","hub_server"]]
+
+2019-03-11T20:39:35.621 TRACE end connect host:127.0.0.1, port:1236
+
+2019-03-11T20:39:35.631 TRACE begin on data
+
+2019-03-11T20:39:35.631 TRACE ["center_call_hub","distribute_server_address",["dbproxy","127.0.0.1",1235,"276be2df-a490-4e1f-93bc-177f1a28c835"]]
+
+2019-03-11T20:39:35.631 TRACE end on data
+
+2019-03-11T20:39:35.643 TRACE begin on data
+
+2019-03-11T20:39:35.643 TRACE ["gate_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:39:35.644 TRACE end on data
+
+2019-03-11T20:39:35.647 TRACE connect gate sucess
+
+2019-03-11T20:39:35.652 TRACE begin on data
+
+2019-03-11T20:39:35.653 TRACE ["center_call_server","reg_server_sucess",[]]
+
+2019-03-11T20:39:35.653 TRACE end on data
+
+2019-03-11T20:39:35.653 TRACE connect center sucess
+
+2019-03-11T20:39:35.671 TRACE begin on data
+
+2019-03-11T20:39:35.672 TRACE ["center_call_hub","distribute_server_address",["hub","127.0.0.1",4235,"ba1c1b80-43fa-11e9-92b2-abb0bc89ddde"]]
+
+2019-03-11T20:39:35.672 TRACE end on data
+
+2019-03-11T20:39:35.676 TRACE connect raddr: 127.0.0.14235
+
+2019-03-11T20:39:35.679 TRACE message begin
+
+2019-03-11T20:39:35.679 TRACE this.send_buff.length:1, this.serial:1
+
+2019-03-11T20:39:35.679 TRACE push ["hub_call_hub","reg_hub",["hub_server"]]
+
+2019-03-11T20:39:35.680 TRACE message end
+
+2019-03-11T20:39:35.681 TRACE message begin
+
+2019-03-11T20:39:35.681 TRACE message end
+
+2019-03-11T20:39:35.686 TRACE message begin
+
+2019-03-11T20:39:35.686 TRACE on_recv begin
+
+2019-03-11T20:39:35.686 TRACE on_recv ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:39:35.686 TRACE on_recv end
+
+2019-03-11T20:39:35.686 TRACE message end
+
+2019-03-11T20:39:35.687 TRACE message begin
+
+2019-03-11T20:39:35.687 TRACE message end
+
+2019-03-11T20:39:35.688 TRACE connect hub sucess
+
+2019-03-11T20:39:35.714 TRACE message begin
+
+2019-03-11T20:39:35.715 TRACE onConnectReq raddr: 127.0.0.14235
+
+2019-03-11T20:39:35.715 TRACE message end
+
+2019-03-11T20:39:35.715 TRACE message begin
+
+2019-03-11T20:39:35.715 TRACE onConnectReq raddr: 127.0.0.14235
+
+2019-03-11T20:39:35.715 TRACE message end
+
+2019-03-11T20:39:35.715 TRACE message begin
+
+2019-03-11T20:39:35.716 TRACE message end
+
+2019-03-11T20:39:35.716 TRACE message begin
+
+2019-03-11T20:39:35.716 TRACE on_recv begin
+
+2019-03-11T20:39:35.716 TRACE on_recv ["hub_call_hub","reg_hub",["hub_server1"]]
+
+2019-03-11T20:39:35.716 TRACE on_recv end
+
+2019-03-11T20:39:35.716 TRACE message end
+
+2019-03-11T20:39:35.716 TRACE message begin
+
+2019-03-11T20:39:35.716 TRACE message end
+
+2019-03-11T20:39:35.716 TRACE message begin
+
+2019-03-11T20:39:35.716 TRACE message end
+
+2019-03-11T20:39:35.719 TRACE this.send_buff.length:1, this.serial:2
+
+2019-03-11T20:39:35.719 TRACE push ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:39:35.720 TRACE message begin
+
+2019-03-11T20:39:35.720 TRACE message end
+
+2019-03-11T20:52:10.886 TRACE config logger!
+
+2019-03-11T20:52:10.891 TRACE begin connect host:127.0.0.1, port:1234
+
+2019-03-11T20:52:10.896 TRACE connectting host:127.0.0.1, port:1234
+
+2019-03-11T20:52:10.897 TRACE begin on connect center
+
+2019-03-11T20:52:10.898 TRACE ["center","reg_server",["hub","127.0.0.1",4234,"7c55fb20-43fc-11e9-9715-f76388590115"]]
+
+2019-03-11T20:52:10.898 TRACE end on connect center
+
+2019-03-11T20:52:10.898 TRACE end connect host:127.0.0.1, port:1234
+
+2019-03-11T20:52:10.936 TRACE begin on data
+
+2019-03-11T20:52:10.936 TRACE ["center_call_hub","distribute_server_address",["dbproxy","127.0.0.1",1235,"2d932b54-7693-4cae-a3fd-2822a16a2479"]]
+
+2019-03-11T20:52:10.936 TRACE end on data
+
+2019-03-11T20:52:10.948 TRACE begin on data
+
+2019-03-11T20:52:10.948 TRACE ["center_call_hub","distribute_server_address",["gate","127.0.0.1",1236,"321682c1-5a4f-494c-a47d-d504206100a8"]]
+
+2019-03-11T20:52:10.949 TRACE end on data
+
+2019-03-11T20:52:10.954 TRACE begin connect host:127.0.0.1, port:1236
+
+2019-03-11T20:52:10.954 TRACE connectting host:127.0.0.1, port:1236
+
+2019-03-11T20:52:10.955 TRACE ["hub_call_gate","reg_hub",["7c55fb20-43fc-11e9-9715-f76388590115","hub_server"]]
+
+2019-03-11T20:52:10.955 TRACE end connect host:127.0.0.1, port:1236
+
+2019-03-11T20:52:10.957 TRACE begin on data
+
+2019-03-11T20:52:10.957 TRACE ["gate_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:52:10.957 TRACE end on data
+
+2019-03-11T20:52:10.960 TRACE connect gate sucess
+
+2019-03-11T20:52:10.963 TRACE begin on data
+
+2019-03-11T20:52:10.963 TRACE ["center_call_server","reg_server_sucess",[]]
+
+2019-03-11T20:52:10.963 TRACE end on data
+
+2019-03-11T20:52:10.965 TRACE connect center sucess
+
+2019-03-11T20:52:10.984 TRACE begin on data
+
+2019-03-11T20:52:10.984 TRACE ["center_call_hub","distribute_server_address",["hub","127.0.0.1",4235,"7c581e00-43fc-11e9-a4f4-cbe32bd3001a"]]
+
+2019-03-11T20:52:10.984 TRACE end on data
+
+2019-03-11T20:52:10.988 TRACE connect raddr: 127.0.0.14235
+
+2019-03-11T20:52:10.991 TRACE message begin
+
+2019-03-11T20:52:10.992 TRACE this.send_buff.length:1, this.serial:1
+
+2019-03-11T20:52:10.992 TRACE push ["hub_call_hub","reg_hub",["hub_server"]]
+
+2019-03-11T20:52:10.992 TRACE message end
+
+2019-03-11T20:52:10.993 TRACE message begin
+
+2019-03-11T20:52:10.993 TRACE message end
+
+2019-03-11T20:52:10.995 TRACE message begin
+
+2019-03-11T20:52:10.995 TRACE on_recv begin
+
+2019-03-11T20:52:10.995 TRACE on_recv ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:52:10.995 TRACE on_recv end
+
+2019-03-11T20:52:10.995 TRACE message end
+
+2019-03-11T20:52:10.996 TRACE message begin
+
+2019-03-11T20:52:10.996 TRACE message end
+
+2019-03-11T20:52:11.001 TRACE connect hub sucess
+
+2019-03-11T20:52:11.025 TRACE message begin
+
+2019-03-11T20:52:11.025 TRACE onConnectReq raddr: 127.0.0.14235
+
+2019-03-11T20:52:11.025 TRACE message end
+
+2019-03-11T20:52:11.026 TRACE message begin
+
+2019-03-11T20:52:11.026 TRACE message end
+
+2019-03-11T20:52:11.026 TRACE message begin
+
+2019-03-11T20:52:11.026 TRACE on_recv begin
+
+2019-03-11T20:52:11.026 TRACE on_recv ["hub_call_hub","reg_hub",["hub_server1"]]
+
+2019-03-11T20:52:11.026 TRACE on_recv end
+
+2019-03-11T20:52:11.026 TRACE message end
+
+2019-03-11T20:52:11.027 TRACE message begin
+
+2019-03-11T20:52:11.027 TRACE message end
+
+2019-03-11T20:52:11.031 TRACE this.send_buff.length:1, this.serial:2
+
+2019-03-11T20:52:11.031 TRACE push ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:52:11.032 TRACE message begin
+
+2019-03-11T20:52:11.032 TRACE message end
+
+2019-03-11T20:52:11.032 TRACE message begin
+
+2019-03-11T20:52:11.032 TRACE message end
+
+2019-03-11T20:53:37.633 TRACE config logger!
+
+2019-03-11T20:53:37.639 TRACE begin connect host:127.0.0.1, port:1234
+
+2019-03-11T20:53:37.643 TRACE connectting host:127.0.0.1, port:1234
+
+2019-03-11T20:53:37.644 TRACE begin on connect center
+
+2019-03-11T20:53:37.645 TRACE ["center","reg_server",["hub","127.0.0.1",4234,"b00a10a0-43fc-11e9-8fb0-6bd80fed8a6c"]]
+
+2019-03-11T20:53:37.645 TRACE end on connect center
+
+2019-03-11T20:53:37.645 TRACE end connect host:127.0.0.1, port:1234
+
+2019-03-11T20:53:37.686 TRACE begin on data
+
+2019-03-11T20:53:37.686 TRACE ["center_call_hub","distribute_server_address",["dbproxy","127.0.0.1",1235,"613ebaaa-2018-4d6f-9858-2bfa060e219f"]]
+
+2019-03-11T20:53:37.686 TRACE end on data
+
+2019-03-11T20:53:37.697 TRACE begin on data
+
+2019-03-11T20:53:37.697 TRACE ["center_call_hub","distribute_server_address",["gate","127.0.0.1",1236,"6f5bb932-6e4f-4789-975f-af4829ad3a0b"]]
+
+2019-03-11T20:53:37.697 TRACE end on data
+
+2019-03-11T20:53:37.697 TRACE begin connect host:127.0.0.1, port:1236
+
+2019-03-11T20:53:37.698 TRACE connectting host:127.0.0.1, port:1236
+
+2019-03-11T20:53:37.698 TRACE ["hub_call_gate","reg_hub",["b00a10a0-43fc-11e9-8fb0-6bd80fed8a6c","hub_server"]]
+
+2019-03-11T20:53:37.698 TRACE end connect host:127.0.0.1, port:1236
+
+2019-03-11T20:53:37.699 TRACE begin on data
+
+2019-03-11T20:53:37.699 TRACE ["gate_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:53:37.699 TRACE end on data
+
+2019-03-11T20:53:37.703 TRACE connect gate sucess
+
+2019-03-11T20:53:37.707 TRACE begin on data
+
+2019-03-11T20:53:37.708 TRACE ["center_call_server","reg_server_sucess",[]]
+
+2019-03-11T20:53:37.708 TRACE end on data
+
+2019-03-11T20:53:37.710 TRACE connect center sucess
+
+2019-03-11T20:53:37.726 TRACE begin on data
+
+2019-03-11T20:53:37.726 TRACE ["center_call_hub","distribute_server_address",["hub","127.0.0.1",4235,"b00a10a0-43fc-11e9-8d72-f91700340521"]]
+
+2019-03-11T20:53:37.726 TRACE end on data
+
+2019-03-11T20:53:37.728 TRACE connect raddr: 127.0.0.14235
+
+2019-03-11T20:53:37.731 TRACE message begin
+
+2019-03-11T20:53:37.732 TRACE this.send_buff.length:1, this.serial:1
+
+2019-03-11T20:53:37.732 TRACE push ["hub_call_hub","reg_hub",["hub_server"]]
+
+2019-03-11T20:53:37.732 TRACE message end
+
+2019-03-11T20:53:37.733 TRACE 127.0.0.14235 ch.send_buff.length:1
+
+2019-03-11T20:53:37.733 TRACE message begin
+
+2019-03-11T20:53:37.734 TRACE message end
+
+2019-03-11T20:53:37.735 TRACE message begin
+
+2019-03-11T20:53:37.735 TRACE on_recv begin
+
+2019-03-11T20:53:37.735 TRACE on_recv ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:53:37.735 TRACE on_recv end
+
+2019-03-11T20:53:37.735 TRACE message end
+
+2019-03-11T20:53:37.736 TRACE message begin
+
+2019-03-11T20:53:37.736 TRACE message end
+
+2019-03-11T20:53:37.740 TRACE connect hub sucess
+
+2019-03-11T20:53:37.768 TRACE message begin
+
+2019-03-11T20:53:37.768 TRACE onConnectReq raddr: 127.0.0.14235
+
+2019-03-11T20:53:37.768 TRACE message end
+
+2019-03-11T20:53:37.768 TRACE message begin
+
+2019-03-11T20:53:37.769 TRACE onConnectReq raddr: 127.0.0.14235
+
+2019-03-11T20:53:37.769 TRACE message end
+
+2019-03-11T20:53:37.769 TRACE message begin
+
+2019-03-11T20:53:37.769 TRACE message end
+
+2019-03-11T20:53:37.769 TRACE message begin
+
+2019-03-11T20:53:37.769 TRACE on_recv begin
+
+2019-03-11T20:53:37.769 TRACE on_recv ["hub_call_hub","reg_hub",["hub_server1"]]
+
+2019-03-11T20:53:37.769 TRACE on_recv end
+
+2019-03-11T20:53:37.769 TRACE message end
+
+2019-03-11T20:53:37.770 TRACE message begin
+
+2019-03-11T20:53:37.770 TRACE message end
+
+2019-03-11T20:53:37.770 TRACE message begin
+
+2019-03-11T20:53:37.770 TRACE message end
+
+2019-03-11T20:53:37.774 TRACE this.send_buff.length:1, this.serial:2
+
+2019-03-11T20:53:37.774 TRACE push ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:53:37.775 TRACE message begin
+
+2019-03-11T20:53:37.775 TRACE message end
+
+2019-03-11T20:57:02.435 TRACE config logger!
+
+2019-03-11T20:57:02.442 TRACE begin connect host:127.0.0.1, port:1234
+
+2019-03-11T20:57:02.446 TRACE connectting host:127.0.0.1, port:1234
+
+2019-03-11T20:57:02.447 TRACE begin on connect center
+
+2019-03-11T20:57:02.448 TRACE ["center","reg_server",["hub","127.0.0.1",4234,"2a1b7460-43fd-11e9-9d3e-fbb2f21ad988"]]
+
+2019-03-11T20:57:02.448 TRACE end on connect center
+
+2019-03-11T20:57:02.448 TRACE end connect host:127.0.0.1, port:1234
+
+2019-03-11T20:57:02.510 TRACE begin on data
+
+2019-03-11T20:57:02.510 TRACE ["center_call_hub","distribute_server_address",["gate","127.0.0.1",1236,"6f6f0bbe-e6bd-49da-bfca-bfba8f887a89"]]
+
+2019-03-11T20:57:02.510 TRACE end on data
+
+2019-03-11T20:57:02.515 TRACE begin connect host:127.0.0.1, port:1236
+
+2019-03-11T20:57:02.515 TRACE connectting host:127.0.0.1, port:1236
+
+2019-03-11T20:57:02.516 TRACE ["hub_call_gate","reg_hub",["2a1b7460-43fd-11e9-9d3e-fbb2f21ad988","hub_server"]]
+
+2019-03-11T20:57:02.516 TRACE end connect host:127.0.0.1, port:1236
+
+2019-03-11T20:57:02.521 TRACE begin on data
+
+2019-03-11T20:57:02.521 TRACE ["center_call_hub","distribute_server_address",["dbproxy","127.0.0.1",1235,"157b31b6-64e0-479b-a18f-5688260815cb"]]
+
+2019-03-11T20:57:02.522 TRACE end on data
+
+2019-03-11T20:57:02.542 TRACE begin on data
+
+2019-03-11T20:57:02.542 TRACE ["gate_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:57:02.542 TRACE end on data
+
+2019-03-11T20:57:02.543 TRACE connect gate sucess
+
+2019-03-11T20:57:02.543 TRACE begin on data
+
+2019-03-11T20:57:02.543 TRACE ["center_call_server","reg_server_sucess",[]]
+
+2019-03-11T20:57:02.543 TRACE end on data
+
+2019-03-11T20:57:02.549 TRACE connect center sucess
+
+2019-03-11T20:57:02.563 TRACE begin on data
+
+2019-03-11T20:57:02.563 TRACE ["center_call_hub","distribute_server_address",["hub","127.0.0.1",4235,"2a1c37b0-43fd-11e9-a3ca-4d6821969c67"]]
+
+2019-03-11T20:57:02.563 TRACE end on data
+
+2019-03-11T20:57:02.564 TRACE connect raddr: 127.0.0.14235
+
+2019-03-11T20:57:02.567 TRACE message begin
+
+2019-03-11T20:57:02.567 TRACE this.send_buff.length:1, this.serial:1
+
+2019-03-11T20:57:02.567 TRACE push ["hub_call_hub","reg_hub",["hub_server"]]
+
+2019-03-11T20:57:02.567 TRACE message end
+
+2019-03-11T20:57:02.569 TRACE 127.0.0.14235 ch.send_buff.length:1
+
+2019-03-11T20:57:02.569 TRACE message begin
+
+2019-03-11T20:57:02.570 TRACE message end
+
+2019-03-11T20:57:02.574 TRACE message begin
+
+2019-03-11T20:57:02.574 TRACE on_recv begin
+
+2019-03-11T20:57:02.574 TRACE on_recv ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:57:02.574 TRACE on_recv end
+
+2019-03-11T20:57:02.574 TRACE message end
+
+2019-03-11T20:57:02.574 TRACE message begin
+
+2019-03-11T20:57:02.574 TRACE on_recv begin
+
+2019-03-11T20:57:02.574 TRACE on_recv wrong serial serial:1, this.remote_serial:2
+
+2019-03-11T20:57:02.575 TRACE on_recv end
+
+2019-03-11T20:57:02.575 TRACE message end
+
+2019-03-11T20:57:02.575 TRACE connect hub sucess
+
+2019-03-11T20:57:02.575 TRACE message begin
+
+2019-03-11T20:57:02.575 TRACE message end
+
+2019-03-11T20:57:02.624 TRACE message begin
+
+2019-03-11T20:57:02.624 TRACE onConnectReq raddr: 127.0.0.14235
+
+2019-03-11T20:57:02.625 TRACE message end
+
+2019-03-11T20:57:02.625 TRACE message begin
+
+2019-03-11T20:57:02.626 TRACE message end
+
+2019-03-11T20:57:02.626 TRACE message begin
+
+2019-03-11T20:57:02.626 TRACE on_recv begin
+
+2019-03-11T20:57:02.626 TRACE on_recv ["hub_call_hub","reg_hub",["hub_server1"]]
+
+2019-03-11T20:57:02.626 TRACE on_recv end
+
+2019-03-11T20:57:02.626 TRACE message end
+
+2019-03-11T20:57:02.626 TRACE message begin
+
+2019-03-11T20:57:02.626 TRACE message end
+
+2019-03-11T20:57:02.628 TRACE this.send_buff.length:1, this.serial:2
+
+2019-03-11T20:57:02.628 TRACE push ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T20:57:02.629 TRACE message begin
+
+2019-03-11T20:57:02.629 TRACE message end
+
+2019-03-11T20:57:11.309 TRACE begin on data
+
+2019-03-11T20:57:11.309 TRACE ["gate_call_hub","client_connect",["a50fd05f-7a49-4891-91ab-88e9b00ef4ae"]]
+
+2019-03-11T20:57:11.309 TRACE end on data
+
+2019-03-11T20:57:11.315 TRACE client connect:a50fd05f-7a49-4891-91ab-88e9b00ef4ae
+
+2019-03-11T20:57:11.315 TRACE reg client:a50fd05f-7a49-4891-91ab-88e9b00ef4ae
+
+2019-03-11T20:57:11.316 TRACE ["hub_call_gate","connect_sucess",["a50fd05f-7a49-4891-91ab-88e9b00ef4ae"]]
+
+2019-03-11T21:33:34.622 TRACE config logger!
+
+2019-03-11T21:33:34.627 TRACE begin connect host:127.0.0.1, port:1234
+
+2019-03-11T21:33:34.631 TRACE connectting host:127.0.0.1, port:1234
+
+2019-03-11T21:33:34.631 TRACE begin on connect center
+
+2019-03-11T21:33:34.632 TRACE ["center","reg_server",["hub","127.0.0.1",4234,"44c0cc20-4402-11e9-b4af-177e4da2f813"]]
+
+2019-03-11T21:33:34.632 TRACE end on connect center
+
+2019-03-11T21:33:34.632 TRACE end connect host:127.0.0.1, port:1234
+
+2019-03-11T21:33:34.694 TRACE message begin
+
+2019-03-11T21:33:34.695 TRACE onConnectReq raddr: 127.0.0.14235
+
+2019-03-11T21:33:34.695 TRACE message end
+
+2019-03-11T21:33:34.696 TRACE message begin
+
+2019-03-11T21:33:34.696 TRACE message end
+
+2019-03-11T21:33:34.696 TRACE message begin
+
+2019-03-11T21:33:34.697 TRACE on_recv begin
+
+2019-03-11T21:33:34.697 TRACE on_recv ["hub_call_hub","reg_hub",["hub_server1"]]
+
+2019-03-11T21:33:34.697 TRACE on_recv end
+
+2019-03-11T21:33:34.697 TRACE message end
+
+2019-03-11T21:33:34.697 TRACE this.send_buff.length:1, this.serial:1
+
+2019-03-11T21:33:34.698 TRACE push ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T21:33:34.698 TRACE message begin
+
+2019-03-11T21:33:34.699 TRACE message end
+
+2019-03-11T21:33:34.699 TRACE message begin
+
+2019-03-11T21:33:34.699 TRACE message end
+
+2019-03-11T21:33:34.702 TRACE begin on data
+
+2019-03-11T21:33:34.702 TRACE ["center_call_hub","distribute_server_address",["gate","127.0.0.1",1236,"25839dbd-7255-4be8-9a18-874f8afcb29c"]]
+
+2019-03-11T21:33:34.702 TRACE end on data
+
+2019-03-11T21:33:34.705 TRACE begin connect host:127.0.0.1, port:1236
+
+2019-03-11T21:33:34.705 TRACE connectting host:127.0.0.1, port:1236
+
+2019-03-11T21:33:34.706 TRACE ["hub_call_gate","reg_hub",["44c0cc20-4402-11e9-b4af-177e4da2f813","hub_server"]]
+
+2019-03-11T21:33:34.706 TRACE end connect host:127.0.0.1, port:1236
+
+2019-03-11T21:33:34.708 TRACE begin on data
+
+2019-03-11T21:33:34.708 TRACE ["gate_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T21:33:34.708 TRACE end on data
+
+2019-03-11T21:33:34.711 TRACE connect gate sucess
+
+2019-03-11T21:33:34.714 TRACE begin on data
+
+2019-03-11T21:33:34.714 TRACE ["center_call_hub","distribute_server_address",["dbproxy","127.0.0.1",1235,"2beae66b-82ea-4f91-aeba-a55f248dfcd4"]]
+
+2019-03-11T21:33:34.714 TRACE end on data
+
+2019-03-11T21:33:34.726 TRACE begin on data
+
+2019-03-11T21:33:34.726 TRACE ["center_call_hub","distribute_server_address",["hub","127.0.0.1",4235,"44bc8660-4402-11e9-ae61-0738fdcfd2f3"]]
+
+2019-03-11T21:33:34.726 TRACE end on data
+
+2019-03-11T21:33:34.728 TRACE connect raddr: 127.0.0.14235
+
+2019-03-11T21:33:34.729 TRACE message begin
+
+2019-03-11T21:33:34.729 TRACE this.send_buff.length:1, this.serial:2
+
+2019-03-11T21:33:34.729 TRACE push ["hub_call_hub","reg_hub",["hub_server"]]
+
+2019-03-11T21:33:34.729 TRACE message end
+
+2019-03-11T21:33:34.730 TRACE message begin
+
+2019-03-11T21:33:34.730 TRACE message end
+
+2019-03-11T21:33:34.734 TRACE message begin
+
+2019-03-11T21:33:34.735 TRACE on_recv begin
+
+2019-03-11T21:33:34.735 TRACE on_recv ["hub_call_hub","reg_hub_sucess",[]]
+
+2019-03-11T21:33:34.735 TRACE on_recv end
+
+2019-03-11T21:33:34.735 TRACE message end
+
+2019-03-11T21:33:34.735 TRACE message begin
+
+2019-03-11T21:33:34.735 TRACE on_recv begin
+
+2019-03-11T21:33:34.735 TRACE on_recv wrong serial serial:2, this.remote_serial:3
+
+2019-03-11T21:33:34.735 TRACE on_recv end
+
+2019-03-11T21:33:34.735 TRACE message end
+
+2019-03-11T21:33:34.735 TRACE message begin
+
+2019-03-11T21:33:34.735 TRACE message end
+
+2019-03-11T21:33:34.736 TRACE begin on data
+
+2019-03-11T21:33:34.736 TRACE ["center_call_server","reg_server_sucess",[]]
+
+2019-03-11T21:33:34.736 TRACE end on data
+
+2019-03-11T21:33:34.740 TRACE connect hub sucess
+
+2019-03-11T21:33:34.740 TRACE connect center sucess
+
+2019-03-11T21:38:16.974 TRACE begin on data
+
+2019-03-11T21:38:16.975 TRACE ["gate_call_hub","client_connect",["cbea09c6-3810-475d-8147-c86aaa727cbf"]]
+
+2019-03-11T21:38:16.975 TRACE end on data
+
+2019-03-11T21:38:16.979 TRACE client connect:cbea09c6-3810-475d-8147-c86aaa727cbf
+
+2019-03-11T21:38:16.979 TRACE reg client:cbea09c6-3810-475d-8147-c86aaa727cbf
+
+2019-03-11T21:38:16.979 TRACE ["hub_call_gate","connect_sucess",["cbea09c6-3810-475d-8147-c86aaa727cbf"]]
+
+2019-03-11T21:38:17.025 TRACE begin on data
+
+2019-03-11T21:38:17.025 TRACE ["gate_call_hub","client_call_hub",["cbea09c6-3810-475d-8147-c86aaa727cbf","conn_module","connect_hub_server",[]]]
+
+2019-03-11T21:38:17.025 TRACE end on data
+
+2019-03-11T21:38:17.031 TRACE this.send_buff.length:1, this.serial:3
+
+2019-03-11T21:38:17.031 TRACE push ["hub_call_hub","hub_call_hub_mothed",["ack_conn_module","client_connect_hub",["cbea09c6-3810-475d-8147-c86aaa727cbf"]]]
+
+2019-03-11T21:38:17.032 TRACE message begin
+
+2019-03-11T21:38:17.032 TRACE message end
+

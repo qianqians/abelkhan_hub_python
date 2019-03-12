@@ -11,13 +11,15 @@ function hubproxy(hub_name, hub_ch){
     }
 }
 
-function hubmng(){
+function hubmng(hub){
     this.hubproxys = {};
 
     this.reg_hub = function(hub_name, ch){
         var _proxy = new hubproxy(hub_name, ch);
         this.hubproxys[hub_name] = _proxy;
-        
+
+        hub.call_event("hub_connect", [hub_name]);
+
         return _proxy;
     }
 

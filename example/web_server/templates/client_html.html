@@ -12,7 +12,7 @@
         connect_hub_server_fucess : function(){ alert("connect_hub_server_fucess") }
     };
 
-    var _client = new client("{{uuid}}");
+    var _client = new client();
     _client.modules.add_module("conn_module", conn_module);
     _client.add_event_listen("on_connect_gate", function(){
         _client.connect_hub("hub_server");

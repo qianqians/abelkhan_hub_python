@@ -24,7 +24,7 @@ def file_client():
 @app.route('/')
 def index():
     try:
-        sid = str(uuid.uuid1())
-        return render_template("client_html.html", uuid=sid)
+        #sid = str(uuid.uuid1())
+        return render_template("client_html.html")
     except:
         traceback.print_exc()
