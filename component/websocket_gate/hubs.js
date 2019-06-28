@@ -32,6 +32,8 @@ function hubmanager() {
         ch.hub_proxy = hub_proxy;
 
         this.hubs_name.set(hub_name, hub_proxy);
+
+        return hub_proxy;
     }
     
     this.get_hub_by_name = (hub_name) => {
