@@ -1,4 +1,4 @@
-function channel(_sock){
+function websocketchannel(_sock){
     eventobj.call(this);
 
     this.events = [];

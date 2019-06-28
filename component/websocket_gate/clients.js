@@ -45,7 +45,9 @@ function clientmanager(hubmng) {
         }
     }
     
-    this.heartbeat_client = (ticktime) => {
+    this.heartbeat_client = () => {
+        let ticktime = Date.now();
+
         let remove_client = [];
         for (let client of this.client_uuid_map.keys()) {
             if ((client.server_time + 60 * 60 * 1000) < ticktime) {

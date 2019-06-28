@@ -1,5 +1,4 @@
-function center_msg_handle(_gate_, _centerproxy_){
-    this.gate = _gate_;
+function center_msg_handle(_centerproxy_, _close_handle){
     this._centerproxy = _centerproxy_;
 
     this.reg_server_sucess = function(){
@@ -9,7 +8,7 @@ function center_msg_handle(_gate_, _centerproxy_){
     }
 
     this.close_server = function() {
-        this.hub.onCloseServer_event();
+        _close_handle.is_close = true;
     }
 
 }

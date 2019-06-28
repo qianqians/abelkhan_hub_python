@@ -3,7 +3,7 @@ function centerproxy(ch){
     this.center = new center_caller(ch);
     this.hub_call_center = new hub_call_center_caller(ch);
 
-    this.reg_hub = function( ip,  port,  uuid ){
+    this.reg_server = function( ip,  port,  uuid ){
         this.center.reg_server("gate", ip, port, uuid);
 	}
 
