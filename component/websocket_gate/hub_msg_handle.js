@@ -51,7 +51,7 @@ function hub_msg_handle(clients, hubs){
             let _client_proxy = clients.get_client_handle(client_uuid);
             _client_proxy.call_client(_module, func, argvs);
 
-            m_uuids.push(uuid);
+            m_uuids.push(client_uuid);
         }
     }
 
