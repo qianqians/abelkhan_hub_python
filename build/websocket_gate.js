@@ -1068,7 +1068,7 @@ function clientmanager(hubmng) {
             }
     
             if ((client.server_time + 20 * 1000) < ticktime) {
-                if (heartbeats_client.indexOf(client) != -1) {
+                if (this.heartbeats_client.indexOf(client) != -1) {
                     remove_client.push(client);
                 }
             }
@@ -1325,11 +1325,11 @@ process.on('uncaughtException', function (err) {
 
     this.forward_hub_call_group_client = (uuids, _module, func, argvs) => {
         let m_uuids = [];
-        for (let uuid of uuids) {
+        for (let client_uuid of uuids) {
             if (!clients.has_client_uuid(client_uuid)) {
                 continue;
             }
-            if (m_uuids.indexOf(uuid) != -1) {
+            if (m_uuids.indexOf(client_uuid) != -1) {
                 continue;
             }
 

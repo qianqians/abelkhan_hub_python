@@ -40,11 +40,11 @@ function hub_msg_handle(clients, hubs){
 
     this.forward_hub_call_group_client = (uuids, _module, func, argvs) => {
         let m_uuids = [];
-        for (let uuid of uuids) {
+        for (let client_uuid of uuids) {
             if (!clients.has_client_uuid(client_uuid)) {
                 continue;
             }
-            if (m_uuids.indexOf(uuid) != -1) {
+            if (m_uuids.indexOf(client_uuid) != -1) {
                 continue;
             }
 

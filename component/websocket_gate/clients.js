@@ -56,7 +56,7 @@ function clientmanager(hubmng) {
             }
     
             if ((client.server_time + 20 * 1000) < ticktime) {
-                if (heartbeats_client.indexOf(client) != -1) {
+                if (this.heartbeats_client.indexOf(client) != -1) {
                     remove_client.push(client);
                 }
             }
