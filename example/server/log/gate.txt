@@ -1,0 +1,181 @@
+2019-06-29T13:10:28.542 TRACE config logger!
+
+2019-06-29T13:10:28.582 TRACE begin connect host:127.0.0.1, port:1234
+
+2019-06-29T13:10:28.587 TRACE connectting host:127.0.0.1, port:1234
+
+2019-06-29T13:10:28.589 TRACE ["center","reg_server",["gate","127.0.0.1",1236,"35e32d30-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:28.589 TRACE end connect host:127.0.0.1, port:1234
+
+2019-06-29T13:10:28.618 TRACE begin on data
+
+2019-06-29T13:10:28.618 TRACE ["center_call_server","reg_server_sucess",[]]
+
+2019-06-29T13:10:28.618 TRACE end on data
+
+2019-06-29T13:10:28.618 TRACE connect center sucess
+
+2019-06-29T13:10:29.900 TRACE begin on data
+
+2019-06-29T13:10:29.900 TRACE ["hub_call_gate","reg_hub",["36a91540-9a2c-11e9-9a01-7bd0ea33d6ee","hub_server1"]]
+
+2019-06-29T13:10:29.900 TRACE end on data
+
+2019-06-29T13:10:29.901 TRACE ["gate_call_hub","reg_hub_sucess",[]]
+
+2019-06-29T13:10:29.951 TRACE begin on data
+
+2019-06-29T13:10:29.951 TRACE ["hub_call_gate","reg_hub",["36a8c720-9a2c-11e9-b807-a3ee858688d3","hub_server"]]
+
+2019-06-29T13:10:29.951 TRACE end on data
+
+2019-06-29T13:10:29.954 TRACE ["gate_call_hub","reg_hub_sucess",[]]
+
+2019-06-29T13:10:31.741 TRACE ["gate_call_client","ntf_uuid",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d"]]--------send
+
+2019-06-29T13:10:31.781 TRACE begin on data
+
+2019-06-29T13:10:31.781 TRACE ["client_call_gate","connect_server",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d",1561785031780]]--------get
+
+2019-06-29T13:10:31.781 TRACE end on data
+
+2019-06-29T13:10:31.785 TRACE client connect:37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d
+
+2019-06-29T13:10:31.785 TRACE ["gate_call_client","connect_gate_sucess",[]]--------send
+
+2019-06-29T13:10:31.831 TRACE begin on data
+
+2019-06-29T13:10:31.832 TRACE ["client_call_gate","heartbeats",[1561785031831]]--------get
+
+2019-06-29T13:10:31.832 TRACE end on data
+
+2019-06-29T13:10:31.832 TRACE begin on data
+
+2019-06-29T13:10:31.832 TRACE ["client_call_gate","connect_hub",["hub_server"]]--------get
+
+2019-06-29T13:10:31.832 TRACE end on data
+
+2019-06-29T13:10:31.832 TRACE begin on data
+
+2019-06-29T13:10:31.832 TRACE ["client_call_gate","connect_hub",["hub_server1"]]--------get
+
+2019-06-29T13:10:31.832 TRACE end on data
+
+2019-06-29T13:10:31.834 TRACE ["gate_call_client","ack_heartbeats",[]]--------send
+
+2019-06-29T13:10:31.835 TRACE ["gate_call_hub","client_connect",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:31.835 TRACE ["gate_call_hub","client_connect",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:31.840 TRACE begin on data
+
+2019-06-29T13:10:31.841 TRACE ["hub_call_gate","connect_sucess",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:31.841 TRACE end on data
+
+2019-06-29T13:10:31.841 TRACE begin on data
+
+2019-06-29T13:10:31.841 TRACE ["hub_call_gate","connect_sucess",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:31.841 TRACE end on data
+
+2019-06-29T13:10:31.845 TRACE ["gate_call_client","connect_hub_sucess",["hub_server1"]]--------send
+
+2019-06-29T13:10:31.845 TRACE ["gate_call_client","connect_hub_sucess",["hub_server"]]--------send
+
+2019-06-29T13:10:31.881 TRACE begin on data
+
+2019-06-29T13:10:31.881 TRACE ["client_call_gate","forward_client_call_hub",["hub_server","conn_module","connect_hub_server",[]]]--------get
+
+2019-06-29T13:10:31.881 TRACE end on data
+
+2019-06-29T13:10:31.885 TRACE ["gate_call_hub","client_call_hub",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d","conn_module","connect_hub_server",[]]]
+
+2019-06-29T13:10:31.895 TRACE begin on data
+
+2019-06-29T13:10:31.895 TRACE ["hub_call_gate","forward_hub_call_client",["37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d","conn_module","connect_hub_server_fucess",[]]]
+
+2019-06-29T13:10:31.895 TRACE end on data
+
+2019-06-29T13:10:31.897 TRACE ["gate_call_client","call_client",["conn_module","connect_hub_server_fucess",[]]]--------send
+
+2019-06-29T13:10:37.747 TRACE unreg_client:37d400b0-9a2c-11e9-ae9b-3fbbdd24a18d
+
+2019-06-29T13:10:37.766 TRACE ["gate_call_client","ntf_uuid",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d"]]--------send
+
+2019-06-29T13:10:37.815 TRACE begin on data
+
+2019-06-29T13:10:37.815 TRACE ["client_call_gate","connect_server",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d",1561785037815]]--------get
+
+2019-06-29T13:10:37.815 TRACE end on data
+
+2019-06-29T13:10:37.820 TRACE client connect:3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d
+
+2019-06-29T13:10:37.820 TRACE ["gate_call_client","connect_gate_sucess",[]]--------send
+
+2019-06-29T13:10:37.866 TRACE begin on data
+
+2019-06-29T13:10:37.866 TRACE ["client_call_gate","heartbeats",[1561785037865]]--------get
+
+2019-06-29T13:10:37.866 TRACE end on data
+
+2019-06-29T13:10:37.866 TRACE begin on data
+
+2019-06-29T13:10:37.867 TRACE ["client_call_gate","connect_hub",["hub_server"]]--------get
+
+2019-06-29T13:10:37.867 TRACE end on data
+
+2019-06-29T13:10:37.867 TRACE begin on data
+
+2019-06-29T13:10:37.867 TRACE ["client_call_gate","connect_hub",["hub_server1"]]--------get
+
+2019-06-29T13:10:37.867 TRACE end on data
+
+2019-06-29T13:10:37.870 TRACE ["gate_call_client","ack_heartbeats",[]]--------send
+
+2019-06-29T13:10:37.871 TRACE ["gate_call_hub","client_connect",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:37.871 TRACE ["gate_call_hub","client_connect",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:37.873 TRACE begin on data
+
+2019-06-29T13:10:37.873 TRACE ["hub_call_gate","connect_sucess",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:37.873 TRACE end on data
+
+2019-06-29T13:10:37.875 TRACE begin on data
+
+2019-06-29T13:10:37.875 TRACE ["hub_call_gate","connect_sucess",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d"]]
+
+2019-06-29T13:10:37.875 TRACE end on data
+
+2019-06-29T13:10:37.876 TRACE ["gate_call_client","connect_hub_sucess",["hub_server1"]]--------send
+
+2019-06-29T13:10:37.877 TRACE ["gate_call_client","connect_hub_sucess",["hub_server"]]--------send
+
+2019-06-29T13:10:37.917 TRACE begin on data
+
+2019-06-29T13:10:37.917 TRACE ["client_call_gate","forward_client_call_hub",["hub_server","conn_module","connect_hub_server",[]]]--------get
+
+2019-06-29T13:10:37.917 TRACE end on data
+
+2019-06-29T13:10:37.921 TRACE ["gate_call_hub","client_call_hub",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d","conn_module","connect_hub_server",[]]]
+
+2019-06-29T13:10:37.930 TRACE begin on data
+
+2019-06-29T13:10:37.930 TRACE ["hub_call_gate","forward_hub_call_client",["3b6ba660-9a2c-11e9-ae9b-3fbbdd24a18d","conn_module","connect_hub_server_fucess",[]]]
+
+2019-06-29T13:10:37.930 TRACE end on data
+
+2019-06-29T13:10:37.932 TRACE ["gate_call_client","call_client",["conn_module","connect_hub_server_fucess",[]]]--------send
+
+2019-06-29T13:10:58.587 ERROR heartbeats_client is not defined
+
+2019-06-29T13:10:58.588 ERROR ReferenceError: heartbeats_client is not defined
+    at Timeout.heartbeat_client [as _onTimeout] (D:\workspace\abelkhan\abelkhan_js\example\server\websocket_gate.js:1071:17)
+    at ontimeout (timers.js:427:11)
+    at tryOnTimeout (timers.js:289:5)
+    at listOnTimeout (timers.js:252:5)
+    at Timer.processTimers (timers.js:212:10)
+

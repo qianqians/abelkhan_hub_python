@@ -1,7 +1,7 @@
 function client_msg_handle(clients, hubs){
 
     this.connect_server = (client_uuid, clienttick) => {
-        if (clients.has_client_uuid(uuid)){
+        if (clients.has_client_uuid(client_uuid)){
             return;
         }
 
@@ -43,7 +43,7 @@ function client_msg_handle(clients, hubs){
         let uuid = clients.get_client_uuid(current_ch);
 
         let _hub_proxy = hubs.get_hub_by_name(hub_name);
-        if (!_hub_channel){
+        if (!_hub_proxy){
             return;
         }
 

@@ -62,23 +62,23 @@ function gate(argvs){
 	let center_ip = this.center_cfg["ip"];
 	let center_port = this.center_cfg["port"];
 	_connectnetworkservice.connect(center_ip, center_port, this, (center_ch) => {
-        let _centerproxy = new centerproxy(_center_ch);
+        let _centerproxy = new centerproxy(center_ch);
         let _center_call_server = new center_call_server_module();
         let _center_msg_handle = new center_msg_handle(_centerproxy, this.close_handle);
 	    _center_call_server.add_event_listen("reg_server_sucess", _center_msg_handle, _center_msg_handle.reg_server_sucess);
 	    _center_call_server.add_event_listen("close_server", _center_msg_handle, _center_msg_handle.close_server);
 	    _center_process.reg_module(_center_call_server);
-	    _centerproxy.reg_server(inside_ip, inside_port, svr_uuid);
+	    _centerproxy.reg_server(inside_ip, inside_port, this.uuid);
     });
 	
-	let _juggle_service = new juggleservice();
+	let _juggleservice = new juggleservice();
 	_juggleservice.add_process(_center_process);
 	_juggleservice.add_process(_hub_process);
     _juggleservice.add_process(_client_process);
     
     setInterval(_clientmanager.heartbeat_client, 10*1000);
 
-	let juggle_service = _juggle_service;
+	let juggle_service = _juggleservice;
     let that = this;
     let time_now = Date.now();
     this.poll = () => {
@@ -103,6 +103,16 @@ function gate(argvs){
             }
         }
     }
-
-    this.poll();
 }
+
+process.on('uncaughtException', function (err) {
+    getLogger().error(err.message);
+    getLogger().error(err.stack);
+});
+
+(function main() {
+    let args = process.argv.splice(2);
+    let _gate = new gate(args);
+
+    _gate.poll();
+})();

@@ -32,7 +32,7 @@
 	"outside_ip":"0.0.0.0",
 	"outside_port":3236,
 	"heartbeats":true,
-	"log_level":"debug",
+	"log_level":"trace",
 	"log_file":"gate.txt",
 	"log_dir":"./log/"
     },
