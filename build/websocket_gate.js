@@ -1144,7 +1144,7 @@ function clientmanager(hubmng) {
         }
 
         for(let hubproxy of _client.conn_hubs){
-            hubproxy.client_disconnect(client_uuid);
+            hubproxy.client_disconnect(_client_uuid);
         }
     }
     
