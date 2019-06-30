@@ -976,6 +976,9 @@ function client_msg_handle(clients, hubs){
             return;
         }
         _hub_proxy.client_connect(client_uuid);
+
+        let cli_proxy = clients.get_client_handle(client_uuid);
+        cli_proxy.conn_hubs.push(_hub_proxy);
     }
 
     this.enable_heartbeats = () => {
@@ -1015,6 +1018,7 @@ function client_msg_handle(clients, hubs){
     this.caller = new gate_call_client_caller(_ch);
     this.client_time = Date.now();
     this.server_time = Date.now();
+    this.conn_hubs = [];
 
     this.ntf_uuid = function(uuid){
         this.caller.ntf_uuid(uuid);
@@ -1076,9 +1080,9 @@ function clientmanager(hubmng) {
         
         for (let _client of remove_client){
             let client_uuid = this.client_uuid_map.get(_client);
-            this.hubs.for_each_hub((hub_name, hubproxy) => {
+            for(let hubproxy of _client.conn_hubs){
                 hubproxy.client_disconnect(client_uuid);
-            });
+            }
         }
     
         for (let _client of remove_client) {
@@ -1101,9 +1105,9 @@ function clientmanager(hubmng) {
 
         if (((clienttick - _client.client_time) - (servertick - _client.server_time)) > 10 * 1000) {
             let client_uuid = this.client_uuid_map.get(_client);
-            this.hubs.for_each_hub((hub_name, hubproxy) => {
+            for(let hubproxy of _client.conn_hubs){
                 hubproxy.client_exception(client_uuid);
-            });
+            }
         }
     
         _client.server_time = servertick;
@@ -1137,6 +1141,10 @@ function clientmanager(hubmng) {
         let index = this.heartbeats_client.indexOf(_client);
         if (index != -1) {
             this.heartbeats_client.splice(index);
+        }
+
+        for(let hubproxy of _client.conn_hubs){
+            hubproxy.client_disconnect(client_uuid);
         }
     }
     

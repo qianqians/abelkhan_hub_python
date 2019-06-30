@@ -26,6 +26,9 @@ function client_msg_handle(clients, hubs){
             return;
         }
         _hub_proxy.client_connect(client_uuid);
+
+        let cli_proxy = clients.get_client_handle(client_uuid);
+        cli_proxy.conn_hubs.push(_hub_proxy);
     }
 
     this.enable_heartbeats = () => {
