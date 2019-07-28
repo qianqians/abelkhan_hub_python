@@ -1364,25 +1364,27 @@ function hub(argvs){
 
     this.center_process = new juggle_process();
     this.connect_center_service = new connectservice(this.center_process);
-    this.connect_center_service.connect(this.center_cfg["ip"], this.center_cfg["port"], this, function(center_ch){
-        getLogger().trace("begin on connect center");
+    this.connect_center = ()=>{
+        this.connect_center_service.connect(this.center_cfg["ip"], this.center_cfg["port"], this, function(center_ch){
+            getLogger().trace("begin on connect center");
 
-        this.centerproxy = new centerproxy(center_ch);
+            this.centerproxy = new centerproxy(center_ch);
 
-        var center_call_hub = new center_call_hub_module();
-        var center_call_server = new center_call_server_module();
-        var _center_msg_handle = new center_msg_handle(this, this.centerproxy);
-        center_call_server.add_event_listen("reg_server_sucess", _center_msg_handle, _center_msg_handle.reg_server_sucess);
-		center_call_server.add_event_listen("close_server", _center_msg_handle, _center_msg_handle.close_server);
-		center_call_hub.add_event_listen("distribute_server_address", _center_msg_handle, _center_msg_handle.distribute_server_address);
-        center_call_hub.add_event_listen("reload", this, this.onReload_event);
-        this.center_process.reg_module(center_call_hub);
-        this.center_process.reg_module(center_call_server);
+            var center_call_hub = new center_call_hub_module();
+            var center_call_server = new center_call_server_module();
+            var _center_msg_handle = new center_msg_handle(this, this.centerproxy);
+            center_call_server.add_event_listen("reg_server_sucess", _center_msg_handle, _center_msg_handle.reg_server_sucess);
+            center_call_server.add_event_listen("close_server", _center_msg_handle, _center_msg_handle.close_server);
+            center_call_hub.add_event_listen("distribute_server_address", _center_msg_handle, _center_msg_handle.distribute_server_address);
+            center_call_hub.add_event_listen("reload", this, this.onReload_event);
+            this.center_process.reg_module(center_call_hub);
+            this.center_process.reg_module(center_call_server);
 
-        this.centerproxy.reg_hub(this.cfg["ip"], this.cfg["port"], this.uuid);
+            this.centerproxy.reg_hub(this.cfg["ip"], this.cfg["port"], this.uuid);
 
-        getLogger().trace("end on connect center");
-    });
+            getLogger().trace("end on connect center");
+        });
+    }
 
     var gate_call_hub = new gate_call_hub_module();
     var _gate_msg_handle = new gate_msg_handle(this, this.modules);
