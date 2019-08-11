@@ -52,17 +52,17 @@ function juggle_process(){
     }
 
     this.poll = function(){
-        for(ch in this.add_event)
+        for(let ch in this.add_event)
         {
             this.event_set.push(this.add_event[ch]);
         }
         this.add_event = new Array();
 
         var _new_event_set = new Array();
-        for(_ch in this.event_set)
+        for(let _ch in this.event_set)
         {
             var in_remove_event = false;
-            for(ch in this.remove_event)
+            for(let ch in this.remove_event)
             {
                 if (this.event_set[_ch] === this.remove_event[ch])
                 {
@@ -78,7 +78,7 @@ function juggle_process(){
         this.event_set = _new_event_set;
         this.remove_event = new Array();
 
-        for(ch in this.event_set)
+        for(let ch in this.event_set)
         {
 			while (true)
 			{
