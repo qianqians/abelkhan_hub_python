@@ -41,7 +41,9 @@ function hub_msg_handle(clients, hubs){
     this.forward_hub_call_group_client = (uuids, _module, func, argvs) => {
         let m_uuids = [];
         for (let client_uuid of uuids) {
+            getLogger().trace("send client:%s", client_uuid);
             if (!clients.has_client_uuid(client_uuid)) {
+                getLogger().trace("invalid client:%s", client_uuid);
                 continue;
             }
             if (m_uuids.indexOf(client_uuid) != -1) {
@@ -52,6 +54,16 @@ function hub_msg_handle(clients, hubs){
             _client_proxy.call_client(_module, func, argvs);
 
             m_uuids.push(client_uuid);
+        }
+
+        if (func == "role_move_status"){
+            if (this.send_role_move_status_timetmp){
+                let timetmp = Date.now() - this.send_role_move_status_timetmp;
+                if (timemtp > 100){
+                    getLogger().trace("send_role_move_state timeout timemtp:%d", timemtp);
+                }
+            }
+            this.send_role_move_status_timetmp = Date.now();
         }
     }
 

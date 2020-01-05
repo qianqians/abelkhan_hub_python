@@ -25,11 +25,6 @@ function channel(_sock){
                 }
 
                 var json_str = new_data.toString('utf-8', 4, (len + 4));
-                var end = 0;
-                for(var i = 0; json_str[i] != '\0' & i < json_str.length; i++){
-                    end++;
-                }
-                json_str = json_str.substring(0, end);
                 getLogger().trace(json_str);
                 ch.events.push(JSON.parse(json_str));
                 

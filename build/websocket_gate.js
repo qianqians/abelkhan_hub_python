@@ -132,11 +132,6 @@ function channel(_sock){
                 }
 
                 var json_str = new_data.toString('utf-8', 4, (len + 4));
-                var end = 0;
-                for(var i = 0; json_str[i] != '\0' & i < json_str.length; i++){
-                    end++;
-                }
-                json_str = json_str.substring(0, end);
                 getLogger().trace(json_str);
                 ch.events.push(JSON.parse(json_str));
                 
@@ -607,7 +602,206 @@ module.exports.head_len = head_len;function juggleservice(){
         }
     }
 }
-function websocketacceptservice(ip, port, _process){
+/* jshint esversion: 6 */
+const enet = require('./js_enet');
+
+function enetchannel(host, _rhost, _rport){
+    eventobj.call(this);
+
+    this.events = [];
+
+    this.host = host;
+    this.rhost = _rhost;
+    this.rport = _rport;
+
+    this.on_recv = (msg)=>{
+        getLogger().trace("on_recv begin");
+
+        let len = msg[0] | msg[1] << 8 | msg[2] << 16 | msg[3] << 24;
+
+        do{
+            if ( (len + 4) > msg.length){
+                getLogger().trace("on_recv wrong msg.len");
+                break;
+            }
+
+            var json_str = msg.toString('utf-8', 4, (len + 4));
+            getLogger().trace("on_recv", json_str);
+            this.events.push(JSON.parse(json_str));
+            
+        }while(0);
+
+        getLogger().trace("on_recv end");
+    };
+
+    this.push = function(event){
+        var json_str = JSON.stringify(event);
+        var json_buff = Buffer.from(json_str, 'utf-8');
+
+        var send_header = Buffer.alloc(4);
+        send_header.writeUInt8((json_buff.length) & 0xff, 0);
+        send_header.writeUInt8((json_buff.length >> 8) & 0xff, 1);
+        send_header.writeUInt8((json_buff.length >> 16) & 0xff, 2);
+        send_header.writeUInt8((json_buff.length >> 24) & 0xff, 3);
+        var send_data = Buffer.concat([send_header, json_buff]);
+
+        enet.enet_peer_send(host, _rhost, _rport, send_data);
+
+        getLogger().trace("push", json_str);
+    };
+
+    this.pop = function(){
+        if (this.events.length === 0){
+            return null;
+        }
+
+        return this.events.shift();
+    };
+}
+module.exports.enetchannel = enetchannel;/* jshint esversion: 6 */
+
+function ipToInt(ip){
+    var result = ip.split(",");
+    if(!result) return -1;
+    return (parseInt(result[0]) << 24 
+        | parseInt(result[1]) << 16
+        | parseInt(result[2]) << 8
+        | parseInt(result[3]))>>>0;
+}
+
+function enetconnectservice(_process){
+    eventobj.call(this);
+
+    this.process = _process;
+    this.host = enet.enet_client_create(2048);
+    getLogger().trace("enetconnectservice host handle:%d", this.host);
+
+    this.poll = ()=>{
+        let event = enet.enet_host_service(this.host);
+        if (event){
+            switch(event.type)
+            {
+            case 1:
+                {
+                    let raddr = event.ip + ":" + event.port;
+                    getLogger().trace("enetconnectservice poll raddr:%s", raddr);
+                    let ch = new enetchannel(this.host, event.host, event.port);
+                    this.conns[raddr] = ch;
+                    _process.reg_channel(ch);
+
+                    let cb = this.conn_cbs[raddr];
+                    if (cb){
+                        delete this.conn_cbs[raddr];
+                        cb(ch);
+                    }
+                }
+                break;
+            case 3:
+                {
+                    this.onRecv(event.data, event.ip, event.port);
+                }
+                break;
+            }
+        }
+    }
+
+    this.onRecv = (msg, rhost, rport)=>{
+        getLogger().trace("message begin");
+
+        if(msg.length >= 4){
+            let raddr = rhost + ":" + rport;
+            let ch = this.conns[raddr];
+            if (!ch){
+                getLogger().trace("message invalid ch end");
+                return;
+            }
+
+            ch.on_recv(msg);
+        }
+
+        getLogger().trace("message end");
+    }
+
+    this.connect = (rhost, rport, cb) =>{
+        let raddr = rhost + ":" + rport;
+        this.conn_cbs[raddr] = cb;
+
+        getLogger().trace("enetconnectservice connect raddr:%s", raddr);
+
+        enet.enet_host_connect(this.host, rhost, rport);
+    };
+    this.conn_cbs = {};
+    this.conns = {};
+}
+module.exports.enetconnectservice = enetconnectservice;/* jshint esversion: 6 */
+function enetservice(ip, port, _process){
+    eventobj.call(this);
+
+    this.process = _process;
+    this.host = enet.enet_host_create(ip, port, 2048);
+    getLogger().trace("enetservice host handle:%d", this.host);
+
+    this.poll = ()=>{
+        let event = enet.enet_host_service(this.host);
+        if (event){
+            switch(event.type)
+            {
+            case 1:
+                {
+                    let raddr = event.ip + ":" + event.port;
+                    getLogger().trace("enetservice poll raddr:%s", raddr);
+                    let ch = new enetchannel(this.host, event.host, event.port);
+                    this.conns[raddr] = ch;
+                    _process.reg_channel(ch);
+                    
+                    let cb = this.conn_cbs[raddr];
+                    if (cb){
+                        delete this.conn_cbs[raddr];
+                        cb(ch);
+                    }
+                    else{
+                        this.call_event("on_channel_connect", [ch]);
+                    }
+                }
+                break;
+            case 3:
+                {
+                    this.onRecv(event.data, event.ip, event.port);
+                }
+                break;
+            }
+        }
+    }
+
+    this.onRecv = (msg, rhost, rport)=>{
+        getLogger().trace("message begin");
+
+        if(msg.length >= 4){
+            let raddr = rhost + ":" + rport;
+            let ch = this.conns[raddr];
+            if (!ch){
+                getLogger().trace("message invalid ch end");
+                return;
+            }
+
+            ch.on_recv(msg);
+        }
+
+        getLogger().trace("message end");
+    }
+    
+    this.connect = (rhost, rport, cb) =>{
+        let raddr = rhost + ":" + rport;
+        this.conn_cbs[raddr] = cb;
+
+        getLogger().trace("enetservice connect raddr:%s", raddr);
+
+        enet.enet_host_connect(this.host, rhost, rport);
+    };
+    this.conn_cbs = {};
+    this.conns = {};
+}
+module.exports.enetservice = enetservice;function websocketacceptservice(ip, port, _process){
     eventobj.call(this);
     var that = this;
     var WebSocket = require('ws');
@@ -1191,6 +1385,8 @@ function gate(argvs){
     configLogger(path.join(this.cfg["log_dir"], this.cfg["log_file"]), this.cfg["log_level"]);
     getLogger().trace("config logger!");
 
+    enet.enet_initialize();
+
     this.close_handle = new closehandle();
 
 	let _hubmanager = new hubmanager();
@@ -1207,8 +1403,9 @@ function gate(argvs){
 	let _hub_process = new juggle_process();
     _hub_process.reg_module(_hub_call_gate);
     let inside_ip = this.cfg["inside_ip"];
-	let inside_port = this.cfg["inside_port"];
-	let _hub_service = new acceptservice(inside_ip, inside_port, _hub_process);
+    let inside_port = this.cfg["inside_port"];
+    //let _hub_service = new acceptservice(inside_ip, inside_port, _hub_process);
+	this._hub_service = new enetservice(inside_ip, inside_port, _hub_process);
 
     let _client_call_gate = new client_call_gate_module();
     let _client_msg_handle = new client_msg_handle(_clientmanager, _hubmanager);
@@ -1259,6 +1456,7 @@ function gate(argvs){
     let time_now = Date.now();
     this.poll = () => {
         try {
+            this._hub_service.poll();
             juggle_service.poll();
         }
         catch(err) {
@@ -1266,6 +1464,7 @@ function gate(argvs){
         }
 
         if (that.close_handle.is_close){
+            enet.enet_deinitialize();
             process.exit();
         }else{
             var _tmp_now = Date.now();
@@ -1334,7 +1533,9 @@ process.on('uncaughtException', function (err) {
     this.forward_hub_call_group_client = (uuids, _module, func, argvs) => {
         let m_uuids = [];
         for (let client_uuid of uuids) {
+            getLogger().trace("send client:%s", client_uuid);
             if (!clients.has_client_uuid(client_uuid)) {
+                getLogger().trace("invalid client:%s", client_uuid);
                 continue;
             }
             if (m_uuids.indexOf(client_uuid) != -1) {
@@ -1345,6 +1546,16 @@ process.on('uncaughtException', function (err) {
             _client_proxy.call_client(_module, func, argvs);
 
             m_uuids.push(client_uuid);
+        }
+
+        if (func == "role_move_status"){
+            if (this.send_role_move_status_timetmp){
+                let timetmp = Date.now() - this.send_role_move_status_timetmp;
+                if (timemtp > 100){
+                    getLogger().trace("send_role_move_state timeout timemtp:%d", timemtp);
+                }
+            }
+            this.send_role_move_status_timetmp = Date.now();
         }
     }
 

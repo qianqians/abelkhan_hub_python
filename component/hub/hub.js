@@ -17,6 +17,8 @@ function hub(argvs){
     configLogger(path.join(this.cfg["log_dir"], this.cfg["log_file"]), this.cfg["log_level"]);
     getLogger().trace("config logger!");
 
+    enet.enet_initialize();
+
     this.modules = new modulemng();
 
     this.close_handle = new closehandle();
@@ -29,7 +31,7 @@ function hub(argvs){
     hub_call_hub.add_event_listen("hub_call_hub_mothed", _hub_msg_handle, _hub_msg_handle.hub_call_hub_mothed);
     this.hub_process = new juggle_process();
     this.hub_process.reg_module(hub_call_hub);
-    this.hub_service = new udpservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
+    this.hub_service = new enetservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
     //this.connect_hub_service = new connectservice(this.hub_process);
 
     this.center_process = new juggle_process();
@@ -65,7 +67,8 @@ function hub(argvs){
     gate_call_hub.add_event_listen("client_call_hub", _gate_msg_handle, _gate_msg_handle.client_call_hub);
     this.gate_process = new juggle_process();
     this.gate_process.reg_module (gate_call_hub);
-    this.connect_gate_servcie = new connectservice(this.gate_process);
+    this.connect_gate_servcie = new enetconnectservice(this.gate_process);
+    //this.connect_gate_servcie = new udpservice("127.0.0.1", 0, this.gate_process);
     this.gates = new gatemng(this.connect_gate_servcie, this);
 
     this.juggle_service = new juggleservice();
@@ -99,8 +102,10 @@ function hub(argvs){
     var juggle_service = this.juggle_service;
     var that = this;
     var time_now = Date.now();
-    this.poll = function(){
+    this.poll = ()=>{
         try {
+            this.hub_service.poll();
+            this.connect_gate_servcie.poll();
             juggle_service.poll();
 
             that.call_event("on_tick", []);
@@ -110,7 +115,10 @@ function hub(argvs){
         }
 
         if (that.close_handle.is_close){
-            setTimeout(()=>{process.exit()}, 2000);
+            setTimeout(()=>{
+                enet.enet_deinitialize();
+                process.exit();
+            }, 2000);
         }else{
             var _tmp_now = Date.now();
             var _tmp_time = _tmp_now - time_now;
@@ -144,15 +152,14 @@ function hub(argvs){
         this.call_event("on_reload", [argv]);
     }
 
-    var that = this;
-    this.reg_hub = function(hub_ip, hub_port){
-        that.hub_service.connect(hub_ip, hub_port, (ch)=>{
+    this.reg_hub = (hub_ip, hub_port)=>{
+        this.hub_service.connect(hub_ip, hub_port, (ch)=>{
             var caller = new hub_call_hub_caller(ch);
-            caller.reg_hub(that.name);
+            caller.reg_hub(this.name);
         });
     };
 
-    this.try_connect_db = function(dbproxy_ip, dbproxy_port){
+    this.try_connect_db = (dbproxy_ip, dbproxy_port)=>{
         if (!this.cfg["dbproxy"]){
             return;
         }

@@ -15,6 +15,8 @@ function gate(argvs){
     configLogger(path.join(this.cfg["log_dir"], this.cfg["log_file"]), this.cfg["log_level"]);
     getLogger().trace("config logger!");
 
+    enet.enet_initialize();
+
     this.close_handle = new closehandle();
 
 	let _hubmanager = new hubmanager();
@@ -31,8 +33,9 @@ function gate(argvs){
 	let _hub_process = new juggle_process();
     _hub_process.reg_module(_hub_call_gate);
     let inside_ip = this.cfg["inside_ip"];
-	let inside_port = this.cfg["inside_port"];
-	let _hub_service = new acceptservice(inside_ip, inside_port, _hub_process);
+    let inside_port = this.cfg["inside_port"];
+    //let _hub_service = new acceptservice(inside_ip, inside_port, _hub_process);
+	this._hub_service = new enetservice(inside_ip, inside_port, _hub_process);
 
     let _client_call_gate = new client_call_gate_module();
     let _client_msg_handle = new client_msg_handle(_clientmanager, _hubmanager);
@@ -83,6 +86,7 @@ function gate(argvs){
     let time_now = Date.now();
     this.poll = () => {
         try {
+            this._hub_service.poll();
             juggle_service.poll();
         }
         catch(err) {
@@ -90,6 +94,7 @@ function gate(argvs){
         }
 
         if (that.close_handle.is_close){
+            enet.enet_deinitialize();
             process.exit();
         }else{
             var _tmp_now = Date.now();

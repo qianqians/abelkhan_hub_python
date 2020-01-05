@@ -48,7 +48,9 @@ function gatemng(conn, hub){
     this.direct_ch = {};
 
     this.connect_gate = function(uuid, ip, port){
-		this.conn.connect(ip, port, this, function(ch){
+        getLogger().trace("connect_gate ip:%s, port:%d", ip, port);
+		this.conn.connect(ip, port, (ch)=>{
+        //this.conn.connect(ip, port, this, function(ch){
             this.gates[uuid] = new gateproxy(ch, hub);
             ch.gateproxy = this.gates[uuid];
             this.gates[uuid].reg_hub();

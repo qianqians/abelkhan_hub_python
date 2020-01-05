@@ -132,11 +132,6 @@ function channel(_sock){
                 }
 
                 var json_str = new_data.toString('utf-8', 4, (len + 4));
-                var end = 0;
-                for(var i = 0; json_str[i] != '\0' & i < json_str.length; i++){
-                    end++;
-                }
-                json_str = json_str.substring(0, end);
                 getLogger().trace(json_str);
                 ch.events.push(JSON.parse(json_str));
                 
@@ -607,7 +602,206 @@ module.exports.head_len = head_len;function juggleservice(){
         }
     }
 }
-/*this caller file is codegen by juggle for js*/
+/* jshint esversion: 6 */
+const enet = require('./js_enet');
+
+function enetchannel(host, _rhost, _rport){
+    eventobj.call(this);
+
+    this.events = [];
+
+    this.host = host;
+    this.rhost = _rhost;
+    this.rport = _rport;
+
+    this.on_recv = (msg)=>{
+        getLogger().trace("on_recv begin");
+
+        let len = msg[0] | msg[1] << 8 | msg[2] << 16 | msg[3] << 24;
+
+        do{
+            if ( (len + 4) > msg.length){
+                getLogger().trace("on_recv wrong msg.len");
+                break;
+            }
+
+            var json_str = msg.toString('utf-8', 4, (len + 4));
+            getLogger().trace("on_recv", json_str);
+            this.events.push(JSON.parse(json_str));
+            
+        }while(0);
+
+        getLogger().trace("on_recv end");
+    };
+
+    this.push = function(event){
+        var json_str = JSON.stringify(event);
+        var json_buff = Buffer.from(json_str, 'utf-8');
+
+        var send_header = Buffer.alloc(4);
+        send_header.writeUInt8((json_buff.length) & 0xff, 0);
+        send_header.writeUInt8((json_buff.length >> 8) & 0xff, 1);
+        send_header.writeUInt8((json_buff.length >> 16) & 0xff, 2);
+        send_header.writeUInt8((json_buff.length >> 24) & 0xff, 3);
+        var send_data = Buffer.concat([send_header, json_buff]);
+
+        enet.enet_peer_send(host, _rhost, _rport, send_data);
+
+        getLogger().trace("push", json_str);
+    };
+
+    this.pop = function(){
+        if (this.events.length === 0){
+            return null;
+        }
+
+        return this.events.shift();
+    };
+}
+module.exports.enetchannel = enetchannel;/* jshint esversion: 6 */
+
+function ipToInt(ip){
+    var result = ip.split(",");
+    if(!result) return -1;
+    return (parseInt(result[0]) << 24 
+        | parseInt(result[1]) << 16
+        | parseInt(result[2]) << 8
+        | parseInt(result[3]))>>>0;
+}
+
+function enetconnectservice(_process){
+    eventobj.call(this);
+
+    this.process = _process;
+    this.host = enet.enet_client_create(2048);
+    getLogger().trace("enetconnectservice host handle:%d", this.host);
+
+    this.poll = ()=>{
+        let event = enet.enet_host_service(this.host);
+        if (event){
+            switch(event.type)
+            {
+            case 1:
+                {
+                    let raddr = event.ip + ":" + event.port;
+                    getLogger().trace("enetconnectservice poll raddr:%s", raddr);
+                    let ch = new enetchannel(this.host, event.host, event.port);
+                    this.conns[raddr] = ch;
+                    _process.reg_channel(ch);
+
+                    let cb = this.conn_cbs[raddr];
+                    if (cb){
+                        delete this.conn_cbs[raddr];
+                        cb(ch);
+                    }
+                }
+                break;
+            case 3:
+                {
+                    this.onRecv(event.data, event.ip, event.port);
+                }
+                break;
+            }
+        }
+    }
+
+    this.onRecv = (msg, rhost, rport)=>{
+        getLogger().trace("message begin");
+
+        if(msg.length >= 4){
+            let raddr = rhost + ":" + rport;
+            let ch = this.conns[raddr];
+            if (!ch){
+                getLogger().trace("message invalid ch end");
+                return;
+            }
+
+            ch.on_recv(msg);
+        }
+
+        getLogger().trace("message end");
+    }
+
+    this.connect = (rhost, rport, cb) =>{
+        let raddr = rhost + ":" + rport;
+        this.conn_cbs[raddr] = cb;
+
+        getLogger().trace("enetconnectservice connect raddr:%s", raddr);
+
+        enet.enet_host_connect(this.host, rhost, rport);
+    };
+    this.conn_cbs = {};
+    this.conns = {};
+}
+module.exports.enetconnectservice = enetconnectservice;/* jshint esversion: 6 */
+function enetservice(ip, port, _process){
+    eventobj.call(this);
+
+    this.process = _process;
+    this.host = enet.enet_host_create(ip, port, 2048);
+    getLogger().trace("enetservice host handle:%d", this.host);
+
+    this.poll = ()=>{
+        let event = enet.enet_host_service(this.host);
+        if (event){
+            switch(event.type)
+            {
+            case 1:
+                {
+                    let raddr = event.ip + ":" + event.port;
+                    getLogger().trace("enetservice poll raddr:%s", raddr);
+                    let ch = new enetchannel(this.host, event.host, event.port);
+                    this.conns[raddr] = ch;
+                    _process.reg_channel(ch);
+                    
+                    let cb = this.conn_cbs[raddr];
+                    if (cb){
+                        delete this.conn_cbs[raddr];
+                        cb(ch);
+                    }
+                    else{
+                        this.call_event("on_channel_connect", [ch]);
+                    }
+                }
+                break;
+            case 3:
+                {
+                    this.onRecv(event.data, event.ip, event.port);
+                }
+                break;
+            }
+        }
+    }
+
+    this.onRecv = (msg, rhost, rport)=>{
+        getLogger().trace("message begin");
+
+        if(msg.length >= 4){
+            let raddr = rhost + ":" + rport;
+            let ch = this.conns[raddr];
+            if (!ch){
+                getLogger().trace("message invalid ch end");
+                return;
+            }
+
+            ch.on_recv(msg);
+        }
+
+        getLogger().trace("message end");
+    }
+    
+    this.connect = (rhost, rport, cb) =>{
+        let raddr = rhost + ":" + rport;
+        this.conn_cbs[raddr] = cb;
+
+        getLogger().trace("enetservice connect raddr:%s", raddr);
+
+        enet.enet_host_connect(this.host, rhost, rport);
+    };
+    this.conn_cbs = {};
+    this.conns = {};
+}
+module.exports.enetservice = enetservice;/*this caller file is codegen by juggle for js*/
 function center_caller(ch){
     Icaller.call(this, "center", ch);
 
@@ -1179,7 +1373,9 @@ function gatemng(conn, hub){
     this.direct_ch = {};
 
     this.connect_gate = function(uuid, ip, port){
-		this.conn.connect(ip, port, this, function(ch){
+        getLogger().trace("connect_gate ip:%s, port:%d", ip, port);
+		this.conn.connect(ip, port, (ch)=>{
+        //this.conn.connect(ip, port, this, function(ch){
             this.gates[uuid] = new gateproxy(ch, hub);
             ch.gateproxy = this.gates[uuid];
             this.gates[uuid].reg_hub();
@@ -1347,6 +1543,8 @@ function hub(argvs){
     configLogger(path.join(this.cfg["log_dir"], this.cfg["log_file"]), this.cfg["log_level"]);
     getLogger().trace("config logger!");
 
+    enet.enet_initialize();
+
     this.modules = new modulemng();
 
     this.close_handle = new closehandle();
@@ -1359,7 +1557,7 @@ function hub(argvs){
     hub_call_hub.add_event_listen("hub_call_hub_mothed", _hub_msg_handle, _hub_msg_handle.hub_call_hub_mothed);
     this.hub_process = new juggle_process();
     this.hub_process.reg_module(hub_call_hub);
-    this.hub_service = new udpservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
+    this.hub_service = new enetservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
     //this.connect_hub_service = new connectservice(this.hub_process);
 
     this.center_process = new juggle_process();
@@ -1395,7 +1593,8 @@ function hub(argvs){
     gate_call_hub.add_event_listen("client_call_hub", _gate_msg_handle, _gate_msg_handle.client_call_hub);
     this.gate_process = new juggle_process();
     this.gate_process.reg_module (gate_call_hub);
-    this.connect_gate_servcie = new connectservice(this.gate_process);
+    this.connect_gate_servcie = new enetconnectservice(this.gate_process);
+    //this.connect_gate_servcie = new udpservice("127.0.0.1", 0, this.gate_process);
     this.gates = new gatemng(this.connect_gate_servcie, this);
 
     this.juggle_service = new juggleservice();
@@ -1429,8 +1628,10 @@ function hub(argvs){
     var juggle_service = this.juggle_service;
     var that = this;
     var time_now = Date.now();
-    this.poll = function(){
+    this.poll = ()=>{
         try {
+            this.hub_service.poll();
+            this.connect_gate_servcie.poll();
             juggle_service.poll();
 
             that.call_event("on_tick", []);
@@ -1440,7 +1641,10 @@ function hub(argvs){
         }
 
         if (that.close_handle.is_close){
-            setTimeout(()=>{process.exit()}, 2000);
+            setTimeout(()=>{
+                enet.enet_deinitialize();
+                process.exit();
+            }, 2000);
         }else{
             var _tmp_now = Date.now();
             var _tmp_time = _tmp_now - time_now;
@@ -1474,15 +1678,14 @@ function hub(argvs){
         this.call_event("on_reload", [argv]);
     }
 
-    var that = this;
-    this.reg_hub = function(hub_ip, hub_port){
-        that.hub_service.connect(hub_ip, hub_port, (ch)=>{
+    this.reg_hub = (hub_ip, hub_port)=>{
+        this.hub_service.connect(hub_ip, hub_port, (ch)=>{
             var caller = new hub_call_hub_caller(ch);
-            caller.reg_hub(that.name);
+            caller.reg_hub(this.name);
         });
     };
 
-    this.try_connect_db = function(dbproxy_ip, dbproxy_port){
+    this.try_connect_db = (dbproxy_ip, dbproxy_port)=>{
         if (!this.cfg["dbproxy"]){
             return;
         }
