@@ -15,10 +15,13 @@ function enetservice(ip, port, _process){
                 {
                     let raddr = event.ip + ":" + event.port;
                     getLogger().trace("enetservice poll raddr:%s", raddr);
-                    let ch = new enetchannel(this.host, event.host, event.port);
-                    this.conns[raddr] = ch;
-                    _process.reg_channel(ch);
-                    
+                    let ch = this.conns[raddr];
+                    if (!ch){
+                        ch = new enetchannel(this.host, event.host, event.port);
+                        this.conns[raddr] = ch;
+                        _process.reg_channel(ch);
+                    }
+
                     let cb = this.conn_cbs[raddr];
                     if (cb){
                         delete this.conn_cbs[raddr];
