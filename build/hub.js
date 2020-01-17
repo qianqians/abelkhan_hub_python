@@ -1611,7 +1611,7 @@ function hub(argvs){
         client_call_hub.add_event_listen("call_hub", _direct_client_msg_handle, _direct_client_msg_handle.call_hub);
         this.direct_client_process = new juggle_process();
         this.direct_client_process.reg_module(client_call_hub);
-        this.accept_client_service = new acceptservice(this.cfg["out_ip"], this.cfg["out_port"], this.direct_client_process);
+        this.accept_client_service = new websocketacceptservice(this.cfg["out_ip"], this.cfg["out_port"], this.direct_client_process);
         var that = this;
         this.accept_client_service.add_event_listen("on_channel_connect", this, (ch)=>{
             ch.xor_key = xor_key % 256;
