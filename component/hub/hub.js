@@ -82,7 +82,7 @@ function hub(argvs){
         client_call_hub.add_event_listen("call_hub", _direct_client_msg_handle, _direct_client_msg_handle.call_hub);
         this.direct_client_process = new juggle_process();
         this.direct_client_process.reg_module(client_call_hub);
-        this.accept_client_service = new acceptservice(this.cfg["out_ip"], this.cfg["out_port"], this.direct_client_process);
+        this.accept_client_service = new websocketacceptservice(this.cfg["out_ip"], this.cfg["out_port"], this.direct_client_process);
         var that = this;
         this.accept_client_service.add_event_listen("on_channel_connect", this, (ch)=>{
             ch.xor_key = xor_key % 256;
@@ -174,7 +174,6 @@ function hub(argvs){
         dbproxy_call_hub.add_event_listen("reg_hub_sucess", _dbproxy_msg_handle, _dbproxy_msg_handle.reg_hub_sucess);
         dbproxy_call_hub.add_event_listen("ack_create_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_create_persisted_object);
         dbproxy_call_hub.add_event_listen("ack_updata_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_updata_persisted_object);
-        dbproxy_call_hub.add_event_listen("ack_find_and_modify_persisted_object", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_find_and_modify_persisted_object);
         dbproxy_call_hub.add_event_listen("ack_get_object_count", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_count);
         dbproxy_call_hub.add_event_listen("ack_get_object_info", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info);
         dbproxy_call_hub.add_event_listen("ack_get_object_info_end", _dbproxy_msg_handle, _dbproxy_msg_handle.ack_get_object_info_end);
