@@ -12,11 +12,14 @@ service_node_js = ['./service_node_js/channel.js', './service_node_js/acceptserv
                    './service_node_js/enetchannel.js', './service_node_js/enetconnectservice.js', './service_node_js/enetservice.js',
                    './service_node_js/kcpservice.js', './service_node_js/kcpchannel.js']
 service_websocket_js = ['./service_node_js/websocketacceptservice.js', './service_node_js/websocketchannel.js']
-protcol_client_js = ['./protcol/caller/client_call_gatecaller.js', './protcol/module/gate_call_clientmodule.js']
-protcol_hub_js = ['./protcol/caller/centercaller.js', './protcol/caller/hub_call_centercaller.js', './protcol/caller/hub_call_dbproxycaller.js', 
+protcol_client_js = ['./protcol/caller/client_call_gatecaller.js', './protcol/module/gate_call_clientmodule.js',
+                     './protcol/caller/client_call_hubcaller.js', './protcol/module/hub_call_clientmodule.js']
+protcol_hub_js = ['./protcol/caller/centercaller.js', './protcol/caller/hub_call_centercaller.js', 
+                  './protcol/caller/hub_call_dbproxycaller.js', './protcol/caller/hub_call_clientcaller.js',
                   './protcol/caller/hub_call_gatecaller.js', './protcol/caller/hub_call_hubcaller.js',
                   './protcol/module/center_call_hubmodule.js', './protcol/module/center_call_servermodule.js',
-                  './protcol/module/dbproxy_call_hubmodule.js', './protcol/module/gate_call_hubmodule.js', './protcol/module/hub_call_hubmodule.js']
+                  './protcol/module/dbproxy_call_hubmodule.js', './protcol/module/gate_call_hubmodule.js', 
+                  './protcol/module/hub_call_hubmodule.js', './protcol/module/client_call_hubmodule.js']
 protcol_gate_js = ['./protcol/caller/centercaller.js', './protcol/module/center_call_servermodule.js',
                    './protcol/caller/gate_call_clientcaller.js', './protcol/module/client_call_gatemodule.js',
                    './protcol/caller/gate_call_hubcaller.js', './protcol/module/hub_call_gatemodule.js']

@@ -33,9 +33,30 @@ function client(){
 
     this.conn = new connectservice(this._process);
 
+    this._hub_process = new juggle_process();
+    var _hub_module = new hub_call_client_module();
+    this._hub_process.reg_module(_hub_module);
+    _hub_module.add_event_listen("call_client", this, function(module_name, func_name, argvs){
+        this.modules.process_module_mothed(module_name, func_name, argvs);
+    });
+
+    this.hub_conn = new connectservice(this._hub_process);
+
     this.juggle_service = new juggleservice();
     this.juggle_service.add_process(this._process);
+    this.juggle_service.add_process(this._hub_process);
     var juggle_service = this.juggle_service;
+
+    this.direct_ch = {};
+    this.direct_connect_hub = (hub_name, url)=>{
+        let ch = this.hub_conn.connect(url);
+        ch.add_event_listen("onopen", this, function(){
+            let client_call_hub = new client_call_hub_caller(this.ch);
+            this.direct_ch[hub_name] = client_call_hub;
+            client_call_hub.client_connect(this.uuid);
+            //this.client_call_gate.connect_server(this.uuid, new Date().getTime());
+        });
+    }
 
     this.connect_server = function(url){
         this.ch = this.conn.connect(url);
@@ -57,6 +78,11 @@ function client(){
     }
 
     this.call_hub = function(hub_name, module_name, func_name){
+        if (this.direct_ch[hub_name]){
+            this.direct_ch[hub_name].call_hub(this.uuid, module_name, func_name, [].slice.call(arguments, 3));
+            return;
+        }
+
         this.client_call_gate.forward_client_call_hub(hub_name, module_name, func_name, [].slice.call(arguments, 3));
     }
 

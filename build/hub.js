@@ -1018,6 +1018,23 @@ function hub_call_dbproxy_caller(ch){
 hub_call_dbproxy_caller.prototype.constructor = hub_call_dbproxy_caller;
 
 /*this caller file is codegen by juggle for js*/
+function hub_call_client_caller(ch){
+    Icaller.call(this, "hub_call_client", ch);
+
+    this.call_client = function( argv0, argv1, argv2){
+        var _argv = [argv0,argv1,argv2];
+        this.call_module_method.call(this, "call_client", _argv);
+    }
+
+}
+(function(){
+    var Super = function(){};
+    Super.prototype = Icaller.prototype;
+    hub_call_client_caller.prototype = new Super();
+})();
+hub_call_client_caller.prototype.constructor = hub_call_client_caller;
+
+/*this caller file is codegen by juggle for js*/
 function hub_call_gate_caller(ch){
     Icaller.call(this, "hub_call_gate", ch);
 
@@ -1226,6 +1243,27 @@ function hub_call_hub_module(){
     hub_call_hub_module.prototype = new Super();
 })();
 hub_call_hub_module.prototype.constructor = hub_call_hub_module;
+
+/*this module file is codegen by juggle for js*/
+function client_call_hub_module(){
+    eventobj.call(this);
+    Imodule.call(this, "client_call_hub");
+
+    this.client_connect = function(argv0){
+        this.call_event("client_connect", [argv0]);
+    }
+
+    this.call_hub = function(argv0, argv1, argv2, argv3){
+        this.call_event("call_hub", [argv0, argv1, argv2, argv3]);
+    }
+
+}
+(function(){
+    var Super = function(){};
+    Super.prototype = Imodule.prototype;
+    client_call_hub_module.prototype = new Super();
+})();
+client_call_hub_module.prototype.constructor = client_call_hub_module;
 
 function modulemng(){
     this.module_set = {};
