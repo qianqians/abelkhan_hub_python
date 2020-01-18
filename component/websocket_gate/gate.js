@@ -35,7 +35,8 @@ function gate(argvs){
     let inside_ip = this.cfg["inside_ip"];
     let inside_port = this.cfg["inside_port"];
     //let _hub_service = new acceptservice(inside_ip, inside_port, _hub_process);
-	this._hub_service = new enetservice(inside_ip, inside_port, _hub_process);
+    //this._hub_service = new enetservice(inside_ip, inside_port, _hub_process);
+    this._hub_service = new kcpservice(inside_ip, inside_port, _hub_process);
 
     let _client_call_gate = new client_call_gate_module();
     let _client_msg_handle = new client_msg_handle(_clientmanager, _hubmanager);
@@ -86,7 +87,7 @@ function gate(argvs){
     let time_now = Date.now();
     this.poll = () => {
         try {
-            this._hub_service.poll();
+            //this._hub_service.poll();
             juggle_service.poll();
         }
         catch(err) {

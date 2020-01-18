@@ -83,7 +83,7 @@ function juggle_process(){
 			while (true)
 			{
                 var _event = this.event_set[ch].pop();
-                if (_event === null)
+                if (!_event)
                 {
                     break;
                 }
@@ -801,7 +801,144 @@ function enetservice(ip, port, _process){
     this.conn_cbs = {};
     this.conns = {};
 }
-module.exports.enetservice = enetservice;/*this caller file is codegen by juggle for js*/
+module.exports.enetservice = enetservice;/* jshint esversion: 6 */
+
+const kcp = require('./kcp');
+
+function kcpservice(ip, port, _process){
+    eventobj.call(this);
+
+    this.process = _process;
+    this.socket = dgram.createSocket('udp4');
+    this.socket.bind(port);
+    this.conn = {};
+    this.idx = 1;
+
+    this.connect = (rhost, rport, cb)=>{
+        var k = rhost+':'+rport;
+        if (!this.conn[k]){
+            var context = {
+                address : rhost,
+                port : rport
+            };
+            var kcpobj = new kcp.KCP(1, context);
+            kcpobj.nodelay(0, 10, 0, 0);
+            kcpobj.output(this.output.bind(this));
+            this.conn[k] = kcpobj;
+
+            let ch = new kcpchannel(kcpobj);
+            kcpobj.ch = ch;
+            _process.reg_channel(ch);
+        }
+        cb(this.conn[k].ch);
+    };
+
+    this.output = (data, size, context)=>{
+        this.socket.send(data, 0, size, context.port, context.address);
+    };
+
+    this.socket.on('message',(msg, rinfo)=>{
+        //getLogger().trace("message begin");
+
+        var k = rinfo.address+':'+rinfo.port;
+        if (!this.conn[k]){
+            var context = {
+                address : rinfo.address,
+                port : rinfo.port
+            };
+
+            var kcpobj = new kcp.KCP(1, context);
+            kcpobj.nodelay(0, 10, 0, 0);
+            kcpobj.output(this.output.bind(this));
+            this.conn[k] = kcpobj;
+
+            let ch = new kcpchannel(kcpobj);
+            kcpobj.ch = ch;
+            _process.reg_channel(ch);
+
+            this.call_event("on_channel_connect", [ch]);
+        }
+        var kcpobj = this.conn[k];
+        kcpobj.input(msg);
+
+        //getLogger().trace("message:%s", msg);
+    });
+
+    setInterval(()=>{
+        for (let k in this.conn) {
+            //getLogger().trace("address:%s", k);
+            let kcpobj = this.conn[k];
+            kcpobj.update(Date.now());
+            while(true){
+                let recv = kcpobj.recv();
+                if (recv) {
+                    kcpobj.ch.on_recv(recv);
+                }
+                else{
+                    break;
+                }
+            }
+       	}
+    }, 10);
+}
+module.exports.kcpservice = kcpservice;/* jshint esversion: 6 */
+
+function kcpchannel(kcpobj){
+    eventobj.call(this);
+
+    this.events = [];
+
+    this.on_recv = (msg)=>{
+        getLogger().trace("on_recv begin");
+
+        while(msg.length > 4){
+            let len = msg[0] | msg[1] << 8 | msg[2] << 16 | msg[3] << 24;
+
+            if ( (len + 4) > msg.length){
+                getLogger().trace("on_recv wrong msg.len");
+                break;
+            }
+
+            var json_str = msg.toString('utf-8', 4, (len + 4));
+            getLogger().trace("on_recv", json_str);
+            this.events.push(JSON.parse(json_str));
+
+            if ( msg.length > (len + 4) ){
+                 msg = msg.slice(len + 4);
+            }
+            else{
+                break;
+            }
+        }
+
+        getLogger().trace("on_recv end");
+    };
+
+    this.push = function(event){
+        var json_str = JSON.stringify(event);
+        var json_buff = Buffer.from(json_str, 'utf-8');
+
+        var send_header = Buffer.alloc(4);
+        send_header.writeUInt8((json_buff.length) & 0xff, 0);
+        send_header.writeUInt8((json_buff.length >> 8) & 0xff, 1);
+        send_header.writeUInt8((json_buff.length >> 16) & 0xff, 2);
+        send_header.writeUInt8((json_buff.length >> 24) & 0xff, 3);
+        var send_data = Buffer.concat([send_header, json_buff]);
+
+        kcpobj.send(send_data);
+
+        getLogger().trace("push", json_str);
+    };
+
+    this.pop = function(){
+        if (this.events.length === 0){
+            return null;
+        }
+
+        return this.events.shift();
+    };
+}
+module.exports.kcpchannel = kcpchannel;/*this caller file is codegen by juggle for js*/
 function center_caller(ch){
     Icaller.call(this, "center", ch);
 
@@ -1557,8 +1694,8 @@ function hub(argvs){
     hub_call_hub.add_event_listen("hub_call_hub_mothed", _hub_msg_handle, _hub_msg_handle.hub_call_hub_mothed);
     this.hub_process = new juggle_process();
     this.hub_process.reg_module(hub_call_hub);
-    this.hub_service = new enetservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
-    //this.connect_hub_service = new connectservice(this.hub_process);
+    //this.hub_service = new enetservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
+    this.hub_service = new kcpservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
 
     this.center_process = new juggle_process();
     this.connect_center_service = new connectservice(this.center_process);
@@ -1593,8 +1730,8 @@ function hub(argvs){
     gate_call_hub.add_event_listen("client_call_hub", _gate_msg_handle, _gate_msg_handle.client_call_hub);
     this.gate_process = new juggle_process();
     this.gate_process.reg_module (gate_call_hub);
-    this.connect_gate_servcie = new enetconnectservice(this.gate_process);
-    //this.connect_gate_servcie = new udpservice("127.0.0.1", 0, this.gate_process);
+    //this.connect_gate_servcie = new enetconnectservice(this.gate_process);
+    this.connect_gate_servcie = new kcpservice("127.0.0.1", 0, this.gate_process);
     this.gates = new gatemng(this.connect_gate_servcie, this);
 
     this.juggle_service = new juggleservice();
@@ -1630,8 +1767,8 @@ function hub(argvs){
     var time_now = Date.now();
     this.poll = ()=>{
         try {
-            this.hub_service.poll();
-            this.connect_gate_servcie.poll();
+            //this.hub_service.poll();
+            //this.connect_gate_servcie.poll();
             juggle_service.poll();
 
             that.call_event("on_tick", []);

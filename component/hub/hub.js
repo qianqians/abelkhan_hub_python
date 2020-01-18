@@ -31,8 +31,8 @@ function hub(argvs){
     hub_call_hub.add_event_listen("hub_call_hub_mothed", _hub_msg_handle, _hub_msg_handle.hub_call_hub_mothed);
     this.hub_process = new juggle_process();
     this.hub_process.reg_module(hub_call_hub);
-    this.hub_service = new enetservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
-    //this.connect_hub_service = new connectservice(this.hub_process);
+    //this.hub_service = new enetservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
+    this.hub_service = new kcpservice(this.cfg["ip"], this.cfg["port"], this.hub_process);
 
     this.center_process = new juggle_process();
     this.connect_center_service = new connectservice(this.center_process);
@@ -67,8 +67,8 @@ function hub(argvs){
     gate_call_hub.add_event_listen("client_call_hub", _gate_msg_handle, _gate_msg_handle.client_call_hub);
     this.gate_process = new juggle_process();
     this.gate_process.reg_module (gate_call_hub);
-    this.connect_gate_servcie = new enetconnectservice(this.gate_process);
-    //this.connect_gate_servcie = new udpservice("127.0.0.1", 0, this.gate_process);
+    //this.connect_gate_servcie = new enetconnectservice(this.gate_process);
+    this.connect_gate_servcie = new kcpservice("127.0.0.1", 0, this.gate_process);
     this.gates = new gatemng(this.connect_gate_servcie, this);
 
     this.juggle_service = new juggleservice();
@@ -104,8 +104,8 @@ function hub(argvs){
     var time_now = Date.now();
     this.poll = ()=>{
         try {
-            this.hub_service.poll();
-            this.connect_gate_servcie.poll();
+            //this.hub_service.poll();
+            //this.connect_gate_servcie.poll();
             juggle_service.poll();
 
             that.call_event("on_tick", []);
