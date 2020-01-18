@@ -1671,6 +1671,20 @@ function hub_msg_handle(modules, hubs){
         this.modules.process_module_mothed(module_name, func_name, argvs);
     }
 }
+function direct_client_msg_handle(modules, hub){
+    this.modules = modules;
+    this.hub = hub;
+
+    this.client_connect = function(uuid){
+        this.hub.gates.client_direct_connect(uuid, current_ch);
+    }
+
+    this.call_hub = function(uuid, _module, func, argv){
+        this.hub.gates.current_client_uuid = uuid;
+        this.hub.modules.process_module_mothed(_module, func, argv);
+		this.hub.gates.current_client_uuid = "";
+    }
+}
 function hubproxy(hub_name, hub_ch){
     this.name = hub_name;
     this.caller = new hub_call_hub_caller(hub_ch);

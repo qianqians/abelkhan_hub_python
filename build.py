@@ -25,8 +25,10 @@ protcol_gate_js = ['./protcol/caller/centercaller.js', './protcol/module/center_
                    './protcol/caller/gate_call_hubcaller.js', './protcol/module/hub_call_gatemodule.js']
 module_js = ['./module/modulemng.js']
 client_js = ['./component/client/client.js']
-hub_js = ['./component/hub/center_msg_handle.js', './component/hub/centerproxy.js', './component/hub/closehandle.js', './component/hub/dbproxy_msg_handle.js',
-          './component/hub/dbproxyproxy.js', './component/hub/gate_msg_handle.js', './component/hub/gateproxys.js', './component/hub/hub_msg_handle.js',
+hub_js = ['./component/hub/center_msg_handle.js', './component/hub/centerproxy.js', './component/hub/closehandle.js', 
+          './component/hub/dbproxy_msg_handle.js',
+          './component/hub/dbproxyproxy.js', './component/hub/gate_msg_handle.js', './component/hub/gateproxys.js', 
+          './component/hub/hub_msg_handle.js', './component/hub/direct_client_msg_handle.js',
           './component/hub/hubproxys.js', './component/hub/hub.js']
 websocket_gate_js = ['./component/websocket_gate/center_msg_handle.js', './component/websocket_gate/centerproxy.js', './component/websocket_gate/client_msg_handle.js',
                      './component/websocket_gate/clients.js', './component/websocket_gate/closehandle.js', './component/websocket_gate/gate.js',
