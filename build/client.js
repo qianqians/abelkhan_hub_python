@@ -552,12 +552,13 @@ function client(){
     var juggle_service = this.juggle_service;
 
     this.direct_ch = {};
-    this.direct_connect_hub = (hub_name, url)=>{
+    this.direct_connect_hub = (hub_name, url, conn_sucess_cb)=>{
         let ch = this.hub_conn.connect(url);
         ch.add_event_listen("onopen", this, function(){
             let client_call_hub = new client_call_hub_caller(ch);
             this.direct_ch[hub_name] = client_call_hub;
             client_call_hub.client_connect(this.uuid);
+            conn_sucess_cb();
             //this.client_call_gate.connect_server(this.uuid, new Date().getTime());
         });
     }
