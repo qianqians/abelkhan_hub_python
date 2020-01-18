@@ -61,6 +61,7 @@ def build_node_js_hub():
         read_file(juggle_js, codes)
         read_file(event_closure_js, codes)
         read_file(service_node_js, codes)
+        read_file(service_websocket_js, codes)
         read_file(protcol_hub_js, codes)
         read_file(module_js, codes)
         read_file(config_js, codes)
