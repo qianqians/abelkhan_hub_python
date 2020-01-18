@@ -1597,7 +1597,7 @@ function gate(argvs){
     let time_now = Date.now();
     this.poll = () => {
         try {
-            //this._hub_service.poll();
+            this._hub_service.poll();
             juggle_service.poll();
         }
         catch(err) {

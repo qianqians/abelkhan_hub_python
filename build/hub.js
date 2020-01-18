@@ -1923,8 +1923,8 @@ function hub(argvs){
     var time_now = Date.now();
     this.poll = ()=>{
         try {
-            //this.hub_service.poll();
-            //this.connect_gate_servcie.poll();
+            this.hub_service.poll();
+            this.connect_gate_servcie.poll();
             juggle_service.poll();
 
             that.call_event("on_tick", []);
