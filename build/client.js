@@ -561,14 +561,17 @@ function client(){
             conn_sucess_cb();
             //this.client_call_gate.connect_server(this.uuid, new Date().getTime());
         });
+        return ch;
     }
 
-    this.connect_server = function(url){
+    this.connect_server = function(url, conn_sucess_cb){
         this.ch = this.conn.connect(url);
         this.ch.add_event_listen("onopen", this, function(){
             this.client_call_gate = new client_call_gate_caller(this.ch);
             //this.client_call_gate.connect_server(this.uuid, new Date().getTime());
+            conn_sucess_cb();
         });
+        return this.ch;
     }
 
     this.connect_hub = function(hub_name){

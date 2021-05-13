@@ -34,9 +34,7 @@ function gate(argvs){
     _hub_process.reg_module(_hub_call_gate);
     let inside_ip = this.cfg["inside_ip"];
     let inside_port = this.cfg["inside_port"];
-    //let _hub_service = new acceptservice(inside_ip, inside_port, _hub_process);
     this._hub_service = new enetservice(inside_ip, inside_port, _hub_process);
-    //this._hub_service = new kcpservice(inside_ip, inside_port, _hub_process);
 
     let _client_call_gate = new client_call_gate_module();
     let _client_msg_handle = new client_msg_handle(_clientmanager, _hubmanager);
@@ -49,9 +47,12 @@ function gate(argvs){
     _client_call_gate.add_event_listen("forward_client_call_hub", _client_msg_handle, _client_msg_handle.forward_client_call_hub);
 	let _client_process = new juggle_process();
 	_client_process.reg_module(_client_call_gate);
-	let outside_ip = this.cfg["outside_ip"];
+    let host = this.cfg["host"];
+    let is_ssl = this.cfg["is_ssl"];
 	let outside_port = this.cfg["outside_port"];
-	let _client_service = new websocketacceptservice(outside_ip, outside_port, _client_process);
+	let certificate = this.cfg["certificate"];
+	let private_key = this.cfg["private_key"];
+	let _client_service = new websocketacceptservice(host, outside_port, is_ssl, certificate, private_key, _client_process);
 	_client_service.add_event_listen("on_channel_connect", this, (ch) => {
 		let uuid = uuidv1();
 		let _client_proxy = new clientproxy(ch);

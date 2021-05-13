@@ -233,363 +233,7 @@ function connectservice(_process){
     }
 
 }
-/* jshint esversion: 6 */
-
-function udpchannel(_udpservice, _rip, _rport){
-    eventobj.call(this);
-
-    this.events = [];
-
-    this.socket = _udpservice.socket;
-    this.rip = _rip;
-    this.rport = _rport;
-
-    this.serial = 1;
-    this.remote_serial = 1;
-
-    this.conn_buff = [];
-    this.ack_conn_buff = [];
-
-    this.send_buff = [];
-    this.recv_ack_buff = [];
-
-    this.connect_req = ()=>{
-        var send_header = Buffer.alloc(head_len);
-        send_header.writeUInt8(cmdid._connectreq, 0);
-        send_header.writeUInt8((0) & 0xff, 1);
-        send_header.writeUInt8((0 >> 8) & 0xff, 2);
-        send_header.writeUInt8((0 >> 16) & 0xff, 3);
-        send_header.writeUInt8((0 >> 24) & 0xff, 4);
-        send_header.writeUInt8(0, 5);
-        send_header.writeUInt8(0, 6);
-        send_header.writeUInt8(0, 7);
-        send_header.writeUInt8(0, 8);
-        this.socket.send(send_header, this.rport, this.rip);
-
-        this.conn_buff.push(send_header);
-    };
-
-    this.connect_ack = ()=>{
-        var send_header = Buffer.alloc(head_len);
-        send_header.writeUInt8(cmdid._connectack, 0);
-        send_header.writeUInt8((0) & 0xff, 1);
-        send_header.writeUInt8((0 >> 8) & 0xff, 2);
-        send_header.writeUInt8((0 >> 16) & 0xff, 3);
-        send_header.writeUInt8((0 >> 24) & 0xff, 4);
-        send_header.writeUInt8(0, 5);
-        send_header.writeUInt8(0, 6);
-        send_header.writeUInt8(0, 7);
-        send_header.writeUInt8(0, 8);
-        this.socket.send(send_header, this.rport, this.rip);
-
-        this.ack_conn_buff.push(send_header);
-    };
-
-    this.connect_complete = ()=>{
-        var send_header = Buffer.alloc(head_len);
-        send_header.writeUInt8(cmdid._connectcomplete, 0);
-        send_header.writeUInt8((0) & 0xff, 1);
-        send_header.writeUInt8((0 >> 8) & 0xff, 2);
-        send_header.writeUInt8((0 >> 16) & 0xff, 3);
-        send_header.writeUInt8((0 >> 24) & 0xff, 4);
-        send_header.writeUInt8(0, 5);
-        send_header.writeUInt8(0, 6);
-        send_header.writeUInt8(0, 7);
-        send_header.writeUInt8(0, 8);
-        this.socket.send(send_header, this.rport, this.rip);
-    };
-
-    this.response = (serial)=>{
-        var send_header = Buffer.alloc(head_len);
-        send_header.writeUInt8(cmdid._response, 0);
-        send_header.writeUInt8((0) & 0xff, 1);
-        send_header.writeUInt8((0 >> 8) & 0xff, 2);
-        send_header.writeUInt8((0 >> 16) & 0xff, 3);
-        send_header.writeUInt8((0 >> 24) & 0xff, 4);
-        send_header.writeUInt8(serial & 0xff, 5);
-        send_header.writeUInt8((serial >> 8) & 0xff, 6);
-        send_header.writeUInt8((serial >> 16) & 0xff, 7);
-        send_header.writeUInt8((serial >> 24) & 0xff, 8);
-        this.socket.send(send_header, this.rport, this.rip);
-
-        this.recv_ack_buff.push(send_header);
-    };
-
-    this.complete = (serial)=>{
-        var send_header = Buffer.alloc(head_len);
-        send_header.writeUInt8(cmdid._complete, 0);
-        send_header.writeUInt8((0) & 0xff, 1);
-        send_header.writeUInt8((0 >> 8) & 0xff, 2);
-        send_header.writeUInt8((0 >> 16) & 0xff, 3);
-        send_header.writeUInt8((0 >> 24) & 0xff, 4);
-        send_header.writeUInt8(serial & 0xff, 5);
-        send_header.writeUInt8((serial >> 8) & 0xff, 6);
-        send_header.writeUInt8((serial >> 16) & 0xff, 7);
-        send_header.writeUInt8((serial >> 24) & 0xff, 8);
-        this.socket.send(send_header, this.rport, this.rip);
-    };
-
-    this.on_recv = (msg)=>{
-        getLogger().trace("on_recv begin");
-
-        let len = msg[1] | msg[2] << 8 | msg[3] << 16 | msg[4] << 24;
-        let serial = msg[5] | msg[6] << 8 | msg[7] << 16 | msg[8] << 24;
-
-        do{
-            if (serial !== this.remote_serial){
-                getLogger().trace("on_recv wrong serial serial:%d, this.remote_serial:%d", serial, this.remote_serial);
-                break;
-            }
-
-            if ( (len + head_len) > msg.length){
-                getLogger().trace("on_recv wrong msg.len");
-                break;
-            }
-
-            var json_str = msg.toString('utf-8', head_len, (len + head_len));
-            getLogger().trace("on_recv", json_str);
-            this.events.push(JSON.parse(json_str));
-
-            this.remote_serial++;
-            if (this.remote_serial === 0x100000000){
-                this.remote_serial = 1;
-            }
-
-            this.response(serial);
-
-        }while(0);
-
-        getLogger().trace("on_recv end");
-    };
-
-    this.on_recv_ack = (serial)=>{
-        if (this.send_buff.length <= 0){
-            return;
-        }
-
-        let msg = this.send_buff[0];
-        let _serial = msg[5] | msg[6] << 8 | msg[7] << 16 | msg[8] << 24;
-
-        if (serial === _serial){
-            this.send_buff.shift();
-        }
-
-        this.complete(serial);
-    };
-
-    this.on_recv_complete = (serial)=>{
-        if (this.recv_ack_buff.length <= 0){
-            return;
-        }
-
-        let msg = this.recv_ack_buff[0];
-        let _serial = msg[5] | msg[6] << 8 | msg[7] << 16 | msg[8] << 24;
-
-        if (serial === _serial){
-            this.recv_ack_buff.shift();
-        }
-    };
-
-    this.push = function(event){
-        var json_str = JSON.stringify(event);
-        var json_buff = Buffer.from(json_str, 'utf-8');
-
-        var send_header = Buffer.alloc(head_len);
-        send_header.writeUInt8(cmdid._senddatareq, 0);
-        send_header.writeUInt8((json_buff.length) & 0xff, 1);
-        send_header.writeUInt8((json_buff.length >> 8) & 0xff, 2);
-        send_header.writeUInt8((json_buff.length >> 16) & 0xff, 3);
-        send_header.writeUInt8((json_buff.length >> 24) & 0xff, 4);
-        send_header.writeUInt8(this.serial & 0xff, 5);
-        send_header.writeUInt8((this.serial >> 8) & 0xff, 6);
-        send_header.writeUInt8((this.serial >> 16) & 0xff, 7);
-        send_header.writeUInt8((this.serial >> 24) & 0xff, 8);
-        var send_data = Buffer.concat([send_header, json_buff]);
-
-        if (this.send_buff.length <= 0){
-            this.socket.send(send_data, this.rport, this.rip);
-        }
-        this.send_buff.push(send_data);
-        getLogger().trace("this.send_buff.length:%d, this.serial:%d", this.send_buff.length, this.serial);
-
-        this.serial++;
-        if (this.serial === 0x100000000){
-            this.serial = 1;
-        }
-
-        getLogger().trace("push", json_str);
-    };
-
-    this.pop = function(){
-        if (this.events.length === 0){
-            return null;
-        }
-
-        return this.events.shift();
-    };
-}
-module.exports.udpchannel = udpchannel;/* jshint esversion: 6 */
-
-const dgram = require('dgram');
-
-function udpservice(ip, port, _process){
-    eventobj.call(this);
-
-    this.process = _process;
-    this.socket = dgram.createSocket('udp4');
-    this.socket.bind(port);
-
-    this.socket.on('message',(msg,rinfo)=>{
-        getLogger().trace("message begin");
-
-        while(msg.length >= head_len){
-            let cmd = msg[0];
-            let len = msg[1] | msg[2] << 8 | msg[3] << 16 | msg[4] << 24;
-
-            if (cmd === cmdid._connectreq){
-                this.onConnectReq(rinfo.address, rinfo.port);
-            }
-            else if (cmd === cmdid._connectack){
-                this.onConnectAck(rinfo.address, rinfo.port);
-            }
-            else if (cmd === cmdid._connectcomplete){
-                this.onConnectComplete(rinfo.address, rinfo.port);
-            }
-
-            let raddr = rinfo.address + rinfo.port;
-            let ch = this.conns[raddr];
-            if (!ch){
-                getLogger().trace("message invalid ch end");
-                return;
-            }
-
-            if (cmd === cmdid._senddatareq){
-                ch.on_recv(msg);
-            }
-            else if (cmd === cmdid._response){
-                let serial = msg[5] | msg[6] << 8 | msg[7] << 16 | msg[8] << 24;
-                ch.on_recv_ack(serial);
-            }
-            else if (cmd === cmdid._complete){
-                let serial = msg[5] | msg[6] << 8 | msg[7] << 16 | msg[8] << 24;
-                ch.on_recv_complete(serial);
-            }
-
-            if ( msg.length > (len + head_len) ){
-                msg = msg.slice(len + head_len);
-                getLogger().trace("more msg msg.length:%d", msg.length);
-            }
-            else{
-                break;
-            }
-        }
-
-        getLogger().trace("message end");
-    });
-
-    this.connect = (rip, rport, cb) =>{
-        let raddr = rip + rport;
-        getLogger().trace("connect raddr:", raddr);
-        let ch = this.conns[raddr];
-        if (!ch){
-            ch = new udpchannel(this, rip, rport);
-            this.conns[raddr] = ch;
-        }
-        this.conn_cbs[raddr] = cb;
-
-        ch.connect_req();
-    };
-    this.conn_cbs = {};
-    this.conns = {};
-
-    this.onConnectReq = (rip, rport)=>{
-        let raddr = rip + rport;
-        let ch = this.conns[raddr];
-        if (!ch){
-            ch = new udpchannel(this, rip, rport);
-            this.conns[raddr] = ch;
-        }
-        getLogger().trace("onConnectReq raddr:", raddr);
-        ch.connect_ack();
-    };
-
-    this.onConnectAck = (rip, rport)=>{
-        let raddr = rip + rport;
-        let ch = this.conns[raddr];
-        ch.connect_complete();
-        let cb = this.conn_cbs[raddr];
-        if (cb){
-            delete this.conn_cbs[raddr];
-            ch.conn_buff.shift();
-            _process.reg_channel(ch);
-            cb(ch);
-        }
-    };
-
-    this.onConnectComplete = (rip, rport)=>{
-        let raddr = rip + rport;
-        let ch = this.conns[raddr];
-        ch.ack_conn_buff.shift();
-        _process.reg_channel(ch);
-        that.call_event("on_channel_connect", [ch]);
-    };
-
-    let that = this;
-    setInterval(()=>{
-        for(let key in that.conns){
-            let ch = that.conns[key];
-
-            if (ch.conn_buff.length > 0){
-                getLogger().trace("%s ch.send_buff.length:%d", key, ch.conn_buff.length);
-                let send_data = ch.conn_buff[0];
-                this.socket.send(send_data, ch.rport, ch.rip);
-            }
-
-            if (ch.ack_conn_buff.length > 0){
-                getLogger().trace("%s ch.recv_ack_buff.length:%d", key, ch.ack_conn_buff.length);
-                let send_data = ch.ack_conn_buff[0];
-                this.socket.send(send_data, ch.rport, ch.rip);
-            }
-
-            if (ch.send_buff.length > 0){
-                getLogger().trace("%s ch.send_buff.length:%d", key, ch.send_buff.length);
-                let send_data = ch.send_buff[0];
-                this.socket.send(send_data, ch.rport, ch.rip);
-            }
-
-            if (ch.recv_ack_buff.length > 0){
-                getLogger().trace("%s ch.recv_ack_buff.length:%d", key, ch.recv_ack_buff.length);
-                let send_data = ch.recv_ack_buff[0];
-                this.socket.send(send_data, ch.rport, ch.rip);
-            }
-        }
-    }, 10);
-}
-module.exports.udpservice = udpservice;/* jshint esversion: 6 */
-
-var cmdid = {
-	_connectreq : 0,
-	_connectack : 1,
-	_connectcomplete : 2,
-	_senddatareq : 3,
-	_response : 4,
-	_complete : 5,
-	_disconnectreq : 6,
-	_disconnectack : 7,
-	_disconnectcomplete : 8,
-};
-module.exports.cmdid = cmdid;
-
-/*
-* protocol			begin
-* cmdid				char
-* len				uint32 ## data len ##
-* serial			uint32
-* data				char *
-* protocol end
-*/
-var head_len = 1 + 4 + 4;
-module.exports.head_len = head_len;function juggleservice(){
+function juggleservice(){
     this.process_set = [];
     
     this.add_process = function(_process){
@@ -804,158 +448,51 @@ function enetservice(ip, port, _process){
     this.conn_cbs = {};
     this.conns = {};
 }
-module.exports.enetservice = enetservice;/* jshint esversion: 6 */
-
-const kcp = require('./kcp');
-
-function kcpservice(ip, port, _process){
-    eventobj.call(this);
-
-    this.process = _process;
-    this.socket = dgram.createSocket('udp4');
-    this.socket.bind(port);
-    this.conn = {};
-    this.idx = 1;
-
-    this.connect = (rhost, rport, cb)=>{
-        var k = rhost+':'+rport;
-        if (!this.conn[k]){
-            var context = {
-                address : rhost,
-                port : rport
-            };
-            var kcpobj = new kcp.KCP(1, context);
-            kcpobj.nodelay(0, 10, 0, 0);
-            kcpobj.output(this.output.bind(this));
-            this.conn[k] = kcpobj;
-
-            let ch = new kcpchannel(kcpobj);
-            kcpobj.ch = ch;
-            _process.reg_channel(ch);
-        }
-        cb(this.conn[k].ch);
-    };
-
-    this.output = (data, size, context)=>{
-        this.socket.send(data, 0, size, context.port, context.address);
-    };
-
-    this.socket.on('message',(msg, rinfo)=>{
-        //getLogger().trace("message begin");
-
-        var k = rinfo.address+':'+rinfo.port;
-        if (!this.conn[k]){
-            var context = {
-                address : rinfo.address,
-                port : rinfo.port
-            };
-
-            var kcpobj = new kcp.KCP(1, context);
-            kcpobj.nodelay(0, 10, 0, 0);
-            kcpobj.output(this.output.bind(this));
-            this.conn[k] = kcpobj;
-
-            let ch = new kcpchannel(kcpobj);
-            kcpobj.ch = ch;
-            _process.reg_channel(ch);
-
-            this.call_event("on_channel_connect", [ch]);
-        }
-        var kcpobj = this.conn[k];
-        kcpobj.input(msg);
-
-        //getLogger().trace("message:%s", msg);
-    });
-
-    setInterval(()=>{
-        for (let k in this.conn) {
-            //getLogger().trace("address:%s", k);
-            let kcpobj = this.conn[k];
-            kcpobj.update(Date.now());
-            while(true){
-                let recv = kcpobj.recv();
-                if (recv) {
-                    kcpobj.ch.on_recv(recv);
-                }
-                else{
-                    break;
-                }
-            }
-       	}
-    }, 10);
-}
-module.exports.kcpservice = kcpservice;/* jshint esversion: 6 */
-
-function kcpchannel(kcpobj){
-    eventobj.call(this);
-
-    this.events = [];
-
-    this.on_recv = (msg)=>{
-        getLogger().trace("on_recv begin");
-
-        while(msg.length > 4){
-            let len = msg[0] | msg[1] << 8 | msg[2] << 16 | msg[3] << 24;
-
-            if ( (len + 4) > msg.length){
-                getLogger().trace("on_recv wrong msg.len");
-                break;
-            }
-
-            var json_str = msg.toString('utf-8', 4, (len + 4));
-            getLogger().trace("on_recv", json_str);
-            this.events.push(JSON.parse(json_str));
-
-            if ( msg.length > (len + 4) ){
-                 msg = msg.slice(len + 4);
-            }
-            else{
-                break;
-            }
-        }
-
-        getLogger().trace("on_recv end");
-    };
-
-    this.push = function(event){
-        var json_str = JSON.stringify(event);
-        var json_buff = Buffer.from(json_str, 'utf-8');
-
-        var send_header = Buffer.alloc(4);
-        send_header.writeUInt8((json_buff.length) & 0xff, 0);
-        send_header.writeUInt8((json_buff.length >> 8) & 0xff, 1);
-        send_header.writeUInt8((json_buff.length >> 16) & 0xff, 2);
-        send_header.writeUInt8((json_buff.length >> 24) & 0xff, 3);
-        var send_data = Buffer.concat([send_header, json_buff]);
-
-        kcpobj.send(send_data);
-
-        getLogger().trace("push", json_str);
-    };
-
-    this.pop = function(){
-        if (this.events.length === 0){
-            return null;
-        }
-
-        return this.events.shift();
-    };
-}
-module.exports.kcpchannel = kcpchannel;function websocketacceptservice(ip, port, _process){
+module.exports.enetservice = enetservice;function websocketacceptservice(host, port, is_ssl, certificate, private_key, _process){
     eventobj.call(this);
     var that = this;
     var WebSocket = require('ws');
-    var webServer = new WebSocket.Server({port:port});
-    this.process = _process;
-    webServer.on('connection', function connection(ws) {
-        var ch = new websocketchannel(ws);
-        ch.add_event_listen('ondisconnect', that, function(ch){
-            _process.unreg_channel(ch);
-            that.call_event("on_channel_disconnect", [ch]);
+
+    if (is_ssl){
+        var https = require('https');
+        var fs = require('fs');
+        var keypath = private_key;
+        var certpath = certificate;
+        var options = {
+            key: fs.readFileSync(keypath),
+            cert: fs.readFileSync(certpath)
+        };
+        var server=https.createServer(options, function (req, res) {
+            res.writeHead(403);
+            res.end("This is a  WebSockets server!\n");
+        }).listen(port);
+    
+        var webServer = new WebSocket.Server({server:server});
+        this.process = _process;
+        webServer.on('connection', function connection(ws) {
+            var ch = new websocketchannel(ws);
+            ch.add_event_listen('ondisconnect', that, function(ch){
+                _process.unreg_channel(ch);
+                that.call_event("on_channel_disconnect", [ch]);
+            });
+            _process.reg_channel(ch);
+            that.call_event("on_channel_connect", [ch]);
         });
-        _process.reg_channel(ch);
-        that.call_event("on_channel_connect", [ch]);
-    });
+    }
+    else{
+        var webServer = new WebSocket.Server({port:port});
+        this.process = _process;
+        webServer.on('connection', function connection(ws) {
+            var ch = new websocketchannel(ws);
+            ch.add_event_listen('ondisconnect', that, function(ch){
+                _process.unreg_channel(ch);
+                that.call_event("on_channel_disconnect", [ch]);
+            });
+            _process.reg_channel(ch);
+            that.call_event("on_channel_connect", [ch]);
+        });
+    }
+    
 }
 function websocketchannel(_sock){
     eventobj.call(this);
