@@ -2,12 +2,23 @@ function eventobj(){
     this.events = {}
 
     this.add_event_listen = function(event, this_argv, mothed){
-        this.events[event] = {"this_argv":this_argv, "mothed":mothed};
+        if (!this.events[event]){
+            this.events[event] = [];
+        }
+        this.events[event].push({"this_argv":this_argv, "mothed":mothed});
     }
 
     this.call_event = function(event, argvs){
-        if (this.events[event] && this.events[event]["mothed"]){
-            this.events[event]["mothed"].apply(this.events[event]["this_argv"], argvs);
+        if (!this.events[event]){
+            return;
+        }
+
+        for(var _event of this.events[event]){
+            if (!_event["mothed"]){
+                continue;
+            }
+            
+            _event["mothed"].apply(_event["mothed"]["this_argv"], argvs);}
         }
     }
 }
@@ -601,6 +612,7 @@ function client(){
 
         let tick = new Date().getTime();
         if ( this.is_enable_heartbeats && (this.heartbeats_time < (tick - 10 * 1000)) ){
+            this._process.unreg_channel(this.ch);
             this.ch.call_event("ondisconnect", []);
             return;
         }
@@ -610,7 +622,6 @@ function client(){
 
     var that = this;
     this.poll = function(){
-        that.heartbeats();
         juggle_service.poll();
     }
 }
