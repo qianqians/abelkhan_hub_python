@@ -605,7 +605,7 @@ function client(){
             return;
         }
 
-        this.client_call_gate.heartbeats(now);
+        this.client_call_gate.heartbeats(tick);
     }
 
     var that = this;
