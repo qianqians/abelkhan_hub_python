@@ -602,7 +602,7 @@ function client(){
         var now = new Date().getTime();
         if ( (now - this.tick) > 5 * 1000 ){
             if ( this.is_enable_heartbeats && (this.heartbeats_time < (this.tick - 20 * 1000)) ){
-                this.call_event("on_disconnect", []);
+                this.ch.call_event("ondisconnect", []);
                 return;
             }
 
