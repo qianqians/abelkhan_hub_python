@@ -599,16 +599,13 @@ function client(){
             return;
         }
 
-        var now = new Date().getTime();
-        if ( (now - this.tick) > 5 * 1000 ){
-            if ( this.is_enable_heartbeats && (this.heartbeats_time < (this.tick - 20 * 1000)) ){
-                this.ch.call_event("ondisconnect", []);
-                return;
-            }
-
-            this.client_call_gate.heartbeats(now);
+        let tick = new Date().getTime();
+        if ( this.is_enable_heartbeats && (this.heartbeats_time < (tick - 10 * 1000)) ){
+            this.ch.call_event("ondisconnect", []);
+            return;
         }
-        this.tick = now;
+
+        this.client_call_gate.heartbeats(now);
     }
 
     var that = this;
