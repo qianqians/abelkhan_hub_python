@@ -590,6 +590,16 @@ function client(){
         }
     }
 
+    this.close_direct_ch = (hub_name)=>{
+        var ch = this.direct_ch[hub_name];
+        if (ch) {
+            ch.clear();
+            ch.close();
+
+            this._hub_process.unreg_channel(ch);
+        }
+    }
+
     this.connect_server = function(url, conn_sucess_cb){
         this.ch = this.conn.connect(url);
         this.ch.add_event_listen("onopen", this, function(){
