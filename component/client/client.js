@@ -48,11 +48,13 @@ function client(){
     var juggle_service = this.juggle_service;
 
     this.direct_ch = {};
+    this.direct_call = {};
     this.direct_connect_hub = (hub_name, url, conn_sucess_cb)=>{
         let ch = this.hub_conn.connect(url);
         ch.add_event_listen("onopen", this, function(){
+            this.direct_ch[hub_name] = ch;
             let client_call_hub = new client_call_hub_caller(ch);
-            this.direct_ch[hub_name] = client_call_hub;
+            this.direct_call[hub_name] = client_call_hub;
             client_call_hub.client_connect(this.uuid);
             conn_sucess_cb();
             //this.client_call_gate.connect_server(this.uuid, new Date().getTime());
@@ -99,8 +101,8 @@ function client(){
     }
 
     this.call_hub = function(hub_name, module_name, func_name){
-        if (this.direct_ch[hub_name]){
-            this.direct_ch[hub_name].call_hub(this.uuid, module_name, func_name, [].slice.call(arguments, 3));
+        if (this.direct_call[hub_name]){
+            this.direct_call[hub_name].call_hub(this.uuid, module_name, func_name, [].slice.call(arguments, 3));
             return;
         }
 
