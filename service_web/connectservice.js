@@ -5,7 +5,7 @@ function connectservice(_process){
 
     this.connect = function(url){
         var ws = new WebSocket(url);
-
+        
         var ch = new channel(ws);
         ch.add_event_listen("ondisconnect", this, this.on_channel_disconn);
 

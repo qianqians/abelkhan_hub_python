@@ -351,6 +351,10 @@ function channel(_ws){
     this.clear = function(){
         this.events = [];
     }
+
+    this.close = function(){
+        this.ws.close()
+    }
 }
 function connectservice(_process){
     eventobj.call(this);
@@ -359,7 +363,7 @@ function connectservice(_process){
 
     this.connect = function(url){
         var ws = new WebSocket(url);
-
+        
         var ch = new channel(ws);
         ch.add_event_listen("ondisconnect", this, this.on_channel_disconn);
 

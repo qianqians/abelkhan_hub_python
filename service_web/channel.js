@@ -233,4 +233,8 @@ function channel(_ws){
     this.clear = function(){
         this.events = [];
     }
+
+    this.close = function(){
+        this.ws.close()
+    }
 }
