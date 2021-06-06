@@ -229,4 +229,8 @@ function channel(_ws){
 
         return this.events.shift();
     }
+
+    this.clear = function(){
+        this.events = [];
+    }
 }

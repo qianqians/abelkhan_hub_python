@@ -60,6 +60,13 @@ function client(){
         return ch;
     }
 
+    this.clear_event = (hub_name)=>{
+        var ch = this.direct_ch[hub_name];
+        if (ch) {
+            ch.clear();
+        }
+    }
+
     this.connect_server = function(url, conn_sucess_cb){
         this.ch = this.conn.connect(url);
         this.ch.add_event_listen("onopen", this, function(){

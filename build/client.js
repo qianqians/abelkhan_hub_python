@@ -347,6 +347,10 @@ function channel(_ws){
 
         return this.events.shift();
     }
+
+    this.clear = function(){
+        this.events = [];
+    }
 }
 function connectservice(_process){
     eventobj.call(this);
@@ -573,6 +577,13 @@ function client(){
             //this.client_call_gate.connect_server(this.uuid, new Date().getTime());
         });
         return ch;
+    }
+
+    this.clear_event = (hub_name)=>{
+        var ch = this.direct_ch[hub_name];
+        if (ch) {
+            ch.clear();
+        }
     }
 
     this.connect_server = function(url, conn_sucess_cb){
